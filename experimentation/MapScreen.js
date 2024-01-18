@@ -1,5 +1,5 @@
 import React from "react";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 
 import { View, StyleSheet } from "react-native";
 
@@ -9,6 +9,12 @@ var ucrRegion = {
   latitudeDelta: 0.009,
   longitudeDelta: 0.009,
 };
+
+var lot30Coord = {
+  latitude: 33.96942746772863,
+  longitude: -117.33279650010662,
+};
+
 export default function MapScreen() {
   return (
     <View style={styles.container}>
@@ -16,11 +22,13 @@ export default function MapScreen() {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsMyLocationButton
-        showsUserLocation={true}
+        showsUserLocation
         followsUserLocation
-        showsScale
-        minZoomLevel={10}
-      />
+      >
+        <Marker coordinate={lot30Coord}></Marker>
+      </MapView>
+
+      {/* 33.96942746772863, -117.33279650010662 */}
     </View>
   );
 }
@@ -31,6 +39,6 @@ const styles = StyleSheet.create({
   },
   map: {
     width: "100%",
-    height: "75%",
+    height: "100%",
   },
 });
