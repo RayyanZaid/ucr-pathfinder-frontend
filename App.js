@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import MapView, { PROVIDER_GOOGLE, Polyline } from "react-native-maps";
 
+import MapViewDirections from "react-native-maps-directions";
 var ucrRegion = {
   latitude: 33.9737,
   longitude: -117.3281,
@@ -15,6 +16,13 @@ var lot30Coord = {
   longitude: -117.33279650010662,
 };
 
+const coordinates = [
+  { latitude: 33.9737, longitude: -117.3281 },
+  {
+    latitude: 33.96942746772863,
+    longitude: -117.33279650010662,
+  },
+];
 export default function App() {
   return (
     <MapView
@@ -22,17 +30,16 @@ export default function App() {
       initialRegion={ucrRegion}
       provider={PROVIDER_GOOGLE}
     >
-      <Polyline
-        coordinates={[
-          { latitude: 33.9737, longitude: -117.3281 },
-          { latitude: 33.96942746772863, longitude: -117.33279650010662 },
-        ]}
-        strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-        strokeColors={[
-          "#7F0000",
-          "#00000000", // no color, creates a "long" gradient between the previous and next coordinate
-        ]}
-        strokeWidth={6}
+      <MapViewDirections
+        apikey="AIzaSyCAtOelti_U6pD67Arv0sSBiKbNkb8_oCk"
+        origin={coordinates[0]}
+        destination={coordinates[1]}
+        strokeWidth={3}
+        onReady={(result) => {
+          console.log("Distance: " + result.distance + " km");
+          console.log("Duration: " + result.duration + " min.");
+        }}
+        mode="WALKING"
       />
     </MapView>
   );
@@ -53,3 +60,18 @@ const styles = StyleSheet.create({
 });
 
 // AIzaSyCAtOelti_U6pD67Arv0sSBiKbNkb8_oCk
+
+{
+  /* <Polyline
+coordinates={[
+  { latitude: 33.9737, longitude: -117.3281 },
+  { latitude: 33.96942746772863, longitude: -117.33279650010662 },
+]}
+strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+strokeColors={[
+  "#7F0000",
+  "#00000000", // no color, creates a "long" gradient between the previous and next coordinate
+]}
+strokeWidth={6}
+/> */
+}
