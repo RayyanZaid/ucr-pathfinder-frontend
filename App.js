@@ -76,6 +76,7 @@ export default function App() {
         provider={PROVIDER_GOOGLE}
         showsUserLocation
         showsMyLocationButton
+        mapType="satellite"
       >
         <MapViewDirections
           apikey="AIzaSyCAtOelti_U6pD67Arv0sSBiKbNkb8_oCk"
@@ -89,7 +90,7 @@ export default function App() {
             console.log("Distance: " + result.distance + " km");
             console.log("Duration: " + result.duration + " min.");
           }}
-          mode="DRIVING"
+          mode="WALKING"
         />
       </MapView>
     </View>
