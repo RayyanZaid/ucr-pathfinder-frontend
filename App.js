@@ -78,7 +78,7 @@ export default function App() {
         showsMyLocationButton
         mapType="satellite"
       >
-        <MapViewDirections
+        {/* <MapViewDirections
           apikey="AIzaSyCAtOelti_U6pD67Arv0sSBiKbNkb8_oCk"
           origin={{
             latitude: location?.latitude ?? 0,
@@ -90,8 +90,8 @@ export default function App() {
             console.log("Distance: " + result.distance + " km");
             console.log("Duration: " + result.duration + " min.");
           }}
-          mode="WALKING"
-        />
+          mode="DRIVING"
+        /> */}
       </MapView>
     </View>
   );
