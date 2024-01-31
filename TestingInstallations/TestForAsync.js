@@ -19,6 +19,8 @@ const getData = async () => {
     const value = await AsyncStorage.getItem("my-key");
     if (value !== null) {
       console.log("Yay, getData successful. Here is the value: ", value);
+    } else {
+      console.log("Value has not been stored yet");
     }
   } catch (e) {
     console.log("Reading Error", e);
