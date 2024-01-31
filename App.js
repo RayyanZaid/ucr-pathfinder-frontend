@@ -26,6 +26,18 @@ const coordinates = [
     latitude: 33.96942746772863,
     longitude: -117.33279650010662,
   },
+
+  // WCH
+  {
+    latitude: 33.975495260573226,
+    longitude: -117.32604473250763,
+  },
+
+  // A122
+  {
+    latitude: 33.97555531646568,
+    longitude: -117.32730537068244,
+  },
 ];
 
 export default function App() {
