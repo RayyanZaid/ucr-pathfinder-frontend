@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:5000/";
+const API_URL = "http://" + process.env.EXPO_PUBLIC_LOCAL_IP_ADDRESS + ":5000/";
 
 const TestForAxios = () => {
   const [data, setData] = useState([]);
