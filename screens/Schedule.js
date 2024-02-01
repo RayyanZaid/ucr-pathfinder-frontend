@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import ScheduleScreen from "./screens/Schedule";
+import UploadICS from "../components/UploadICS";
 
-export default function App() {
+export default function ScheduleScreen() {
   return (
     <View style={styles.container}>
-      <ScheduleScreen />
-
+      <Text>Schedule Screen</Text>
+      <UploadICS />
       <StatusBar style="auto" />
     </View>
   );
