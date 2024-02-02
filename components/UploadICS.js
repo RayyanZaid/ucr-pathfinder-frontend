@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import axios from "axios";
+import Icon from "react-native-vector-icons/FontAwesome"; // Import the icon component
+import { Dimensions } from "react-native";
 
 const API_URL =
   "http://" + process.env.EXPO_PUBLIC_LOCAL_IP_ADDRESS + ":5000/upload";
 
+const width = Dimensions.get("window").width;
+const height = Dimensions.get("window").height;
 export default function UploadICS() {
   const [file, setFile] = useState(null);
 
@@ -50,10 +54,18 @@ export default function UploadICS() {
 
   return (
     <View style={styles.container}>
-      <Text>Upload File</Text>
+      <TouchableOpacity style={styles.uploadBox} onPress={pickFile}>
+        <Icon name="cloud-upload" size={50} color="#000" />
+        <Text style={styles.textInUpload}>
+          Tap to Upload Your Schedule (.ics)
+        </Text>
+      </TouchableOpacity>
 
-      <Button title="Pick a File" onPress={pickFile} />
-      {file && <Button title="Upload File" onPress={uploadFile} />}
+      {file && (
+        <TouchableOpacity style={styles.button} onPress={uploadFile}>
+          <Text>Upload File</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -64,5 +76,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  uploadBox: {
+    width: width * 0.5,
+    height: width * 0.5,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  button: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 5,
+  },
+
+  textInUpload: {
+    textAlign: "center",
+    marginVertical: 20,
   },
 });
