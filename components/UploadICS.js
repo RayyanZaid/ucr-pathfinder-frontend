@@ -33,6 +33,8 @@ export default function UploadICS() {
           type: "*/*", // Adjust the file type as needed
         });
 
+        formData.append("uid", "temporary");
+
         const response = await axios.post(API_URL, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
