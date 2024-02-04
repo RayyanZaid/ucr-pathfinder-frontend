@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import UploadICS from "../components/UploadICS";
 import { useState } from "react";
+import FullScheduleDisplay from "../components/FullScheduleDisplay";
 
 export default function ScheduleScreen() {
   const [isSaved, setIsSaved] = useState(false);
@@ -15,7 +16,7 @@ export default function ScheduleScreen() {
   return (
     <View style={styles.container}>
       {isSaved ? (
-        <Text>Display Schedule</Text>
+        <FullScheduleDisplay />
       ) : (
         <UploadICS onIsSavedChange={handleIsSavedChange} />
       )}
