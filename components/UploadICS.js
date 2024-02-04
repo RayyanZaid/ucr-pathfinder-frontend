@@ -10,14 +10,13 @@ import {
 import { StatusBar } from "expo-status-bar";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
-import axios from "axios";
+
+import api from "../api";
+
 import Icon from "react-native-vector-icons/FontAwesome"; // Import the icon component
 
 import button_styles from "../styles/button_styles";
 import text_styles from "../styles/text_styles";
-
-const API_URL =
-  "http://" + process.env.EXPO_PUBLIC_LOCAL_IP_ADDRESS + ":5000/upload";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -57,11 +56,7 @@ export default function UploadICS({ onIsSavedChange }) {
 
         formData.append("uid", "temporary");
 
-        const response = await axios.post(API_URL, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await api.post("/upload", formData);
 
         if (response.data.message === "File successfully uploaded") {
           setIsSaved(true);
