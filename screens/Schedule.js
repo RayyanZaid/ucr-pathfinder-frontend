@@ -1,4 +1,4 @@
-import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,68 +8,76 @@ import {
   Dimensions,
 } from "react-native";
 import UploadICS from "../components/UploadICS";
-import { useEffect, useState } from "react";
 import OneDayScheduleDisplay from "../components/OneDayScheduleDisplay";
 import api from "../api";
-import React, { useRef } from "react";
-
+import Icon from "react-native-vector-icons/FontAwesome";
 const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
 
 export default function ScheduleScreen() {
   const [isSaved, setIsSaved] = useState(true);
   const [scheduleDictionaryArray, setScheduleDictionaryArray] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0); // New state to track current index
 
   const scrollViewRef = useRef();
 
-  const scrollToNextDay = () => {
-    scrollViewRef.current.scrollTo({
-      x: screenWidth * (currentIndex + 1),
-      animated: true,
-    });
-    // Update currentIndex accordingly
-  };
-
-  const scrollToPreviousDay = () => {
-    scrollViewRef.current.scrollTo({
-      x: screenWidth * (currentIndex - 1),
-      animated: true,
-    });
-    // Update currentIndex accordingly
-  };
-
   useEffect(() => {
     const uid = "rayyanzaid0401@gmail.com";
-
-    // Send a GET request with the uid as a query parameter
     api
       .get("/displaySchedule", { params: { uid } })
       .then((response) => {
-        // Handle the response data here
-        console.log(response.data["scheduleDictionaryArray"]);
         setScheduleDictionaryArray(response.data["scheduleDictionaryArray"]);
-        console.log(scheduleDictionaryArray);
+        // Set initial position based on the current day, adjusted as necessary
+        const date = new Date();
+        const currentDayNumber = date.getDay() - 1;
+        setCurrentIndex(currentDayNumber); // Initialize currentIndex to the current day
+        const initialPosition = screenWidth * currentDayNumber;
+        scrollViewRef.current.scrollTo({ x: initialPosition, animated: false });
       })
       .catch((error) => {
-        // Handle any errors here
         console.error("Error fetching data:", error);
       });
   }, []);
 
-  function handleIsSavedChange(isSaveFromChild) {
-    // Handle the isSaved state here
-    console.log("isSaved state in parent component:", isSaveFromChild);
-    setIsSaved(isSaveFromChild);
-  }
+  const scrollToNextDay = () => {
+    const nextIndex = currentIndex + 1;
+    scrollViewRef.current.scrollTo({
+      x: screenWidth * nextIndex,
+      animated: true,
+    });
+    setCurrentIndex(nextIndex); // Update currentIndex accordingly
+  };
+
+  const scrollToPreviousDay = () => {
+    const prevIndex = currentIndex - 1;
+    scrollViewRef.current.scrollTo({
+      x: screenWidth * prevIndex,
+      animated: true,
+    });
+    setCurrentIndex(prevIndex); // Update currentIndex accordingly
+  };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={scrollToPreviousDay}></TouchableOpacity>
+      {currentIndex > 0 && (
+        <TouchableOpacity
+          onPress={scrollToPreviousDay}
+          style={styles.leftArrow}
+        >
+          <Icon name="arrow-left" size={30} color="#000" />
+        </TouchableOpacity>
+      )}
       <ScrollView
         horizontal={true}
         pagingEnabled={true}
         ref={scrollViewRef}
         showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(e) => {
+          // Update currentIndex based on scroll position
+          const newIndex = Math.round(
+            e.nativeEvent.contentOffset.x / screenWidth
+          );
+          setCurrentIndex(newIndex);
+        }}
       >
         {scheduleDictionaryArray.map((schedule, index) => (
           <OneDayScheduleDisplay
@@ -79,7 +87,11 @@ export default function ScheduleScreen() {
           />
         ))}
       </ScrollView>
-      <TouchableOpacity onPress={scrollToNextDay}></TouchableOpacity>
+      {currentIndex < scheduleDictionaryArray.length - 1 && (
+        <TouchableOpacity onPress={scrollToNextDay} style={styles.rightArrow}>
+          <Icon name="arrow-right" size={30} color="#000" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -87,8 +99,19 @@ export default function ScheduleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     alignItems: "center",
     justifyContent: "center",
+  },
+  leftArrow: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    zIndex: 10,
+  },
+  rightArrow: {
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    zIndex: 10,
   },
 });

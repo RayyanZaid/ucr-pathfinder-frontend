@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-import Icon from "react-native-vector-icons/FontAwesome"; // Import the icon component
+import Icon from "react-native-vector-icons/FontAwesome";
 
 import button_styles from "../styles/button_styles";
 import text_styles from "../styles/text_styles";
