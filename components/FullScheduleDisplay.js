@@ -16,7 +16,10 @@ import text_styles from "../styles/text_styles";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
+
 export default function FullScheduleDisplay() {
+  const [scheduleDictionary, setScheduleDictionary] = useState({});
+
   return (
     <View style={styles.container}>
       <Text>YAY</Text>
