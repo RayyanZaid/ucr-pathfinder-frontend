@@ -18,7 +18,7 @@ const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 export default function FullScheduleDisplay() {
-  const [scheduleDictionary, setScheduleDictionary] = useState({});
+  const [scheduleDictionary, setScheduleDictionary] = useState(null);
 
   return (
     <View style={styles.container}>
