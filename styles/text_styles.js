@@ -47,6 +47,34 @@ const text_styles = StyleSheet.create({
     margin: screenHeight * 0.005,
     textAlign: "center",
   },
+
+  scheduleCourseText: {
+    ...fontStyles,
+    fontSize: 24,
+    color: "black",
+    marginTop: 20,
+  },
+  timeRangeText: {
+    ...fontStyles,
+    fontSize: 20,
+    color: "black",
+    margin: 20,
+  },
+  locationText: {
+    ...fontStyles,
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    fontSize: 16,
+  },
+
+  teacherText: {
+    ...fontStyles,
+    position: "absolute",
+    top: 5,
+    left: 5,
+    fontSize: 16,
+  },
 });
 
 export default text_styles;
