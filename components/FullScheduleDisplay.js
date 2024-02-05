@@ -7,6 +7,7 @@ import {
   Animated,
   Dimensions,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
@@ -40,21 +41,24 @@ export default function FullScheduleDisplay() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {scheduleDictionary ? (
-        <ScrollView>
-          <View style={styles.container}>
-            {Object.keys(scheduleDictionary).map((key) => (
-              <EachCourse key={key} courseData={scheduleDictionary[key]} />
-            ))}
-          </View>
-        </ScrollView>
+        <View style={styles.container}>
+          <Text style={text_styles.titleText}>Monday</Text>
+          <ScrollView>
+            <View>
+              {Object.keys(scheduleDictionary).map((key) => (
+                <EachCourse key={key} courseData={scheduleDictionary[key]} />
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       ) : (
         <Text>Loading</Text>
       )}
 
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
 
