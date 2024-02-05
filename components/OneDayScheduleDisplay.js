@@ -19,46 +19,24 @@ import axios from "axios";
 import api from "../api";
 import EachCourse from "./EachCourse";
 
-export default function OneDayScheduleDisplay() {
-  const [scheduleDictionary, setScheduleDictionary] = useState(null);
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 
-  const getDayOfWeek = () => {
+export default function OneDayScheduleDisplay({
+  scheduleDictionary,
+  dayIndex,
+}) {
+  const getDayOfWeek = (dayIndex) => {
     const date = new Date();
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    return days[date.getDay()];
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    return days[dayIndex];
   };
-
-  useEffect(() => {
-    const uid = "rayyanzaid0401@gmail.com";
-
-    // Send a GET request with the uid as a query parameter
-    api
-      .get("/displaySchedule", { params: { uid } })
-      .then((response) => {
-        // Handle the response data here
-        console.log(response.data["scheduleDictionary"]);
-        setScheduleDictionary(response.data["scheduleDictionary"]);
-        console.log(scheduleDictionary);
-      })
-      .catch((error) => {
-        // Handle any errors here
-        console.error("Error fetching data:", error);
-      });
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       {scheduleDictionary ? (
         <View style={styles.container}>
-          <Text style={text_styles.titleText}>{getDayOfWeek()}</Text>
+          <Text style={text_styles.titleText}>{getDayOfWeek(dayIndex)}</Text>
           <View style={{ flex: 1 }}>
             <ScrollView style={{ flex: 1 }}>
               <View>
@@ -88,5 +66,6 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
+    marginHorizontal: screenWidth * 0.05,
   },
 });
