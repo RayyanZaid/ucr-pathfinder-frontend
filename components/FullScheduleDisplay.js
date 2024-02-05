@@ -59,13 +59,21 @@ export default function FullScheduleDisplay() {
       {scheduleDictionary ? (
         <View style={styles.container}>
           <Text style={text_styles.titleText}>{getDayOfWeek()}</Text>
-          <ScrollView>
-            <View>
-              {Object.keys(scheduleDictionary).map((key) => (
-                <EachCourse key={key} courseData={scheduleDictionary[key]} />
-              ))}
-            </View>
-          </ScrollView>
+          <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
+              <View>
+                {Object.keys(scheduleDictionary).map((key) => (
+                  <EachCourse key={key} courseData={scheduleDictionary[key]} />
+                ))}
+              </View>
+            </ScrollView>
+            <Icon
+              name="arrow-down"
+              size={30}
+              color="#000"
+              style={{ alignSelf: "center", marginBottom: 10 }}
+            />
+          </View>
         </View>
       ) : (
         <Text>Loading</Text>
