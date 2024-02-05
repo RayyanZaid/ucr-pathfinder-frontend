@@ -5,7 +5,7 @@ import { useState } from "react";
 import FullScheduleDisplay from "../components/FullScheduleDisplay";
 
 export default function ScheduleScreen() {
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(true);
 
   function handleIsSavedChange(isSaveFromChild) {
     // Handle the isSaved state here
