@@ -22,6 +22,20 @@ import EachCourse from "./EachCourse";
 export default function FullScheduleDisplay() {
   const [scheduleDictionary, setScheduleDictionary] = useState(null);
 
+  const getDayOfWeek = () => {
+    const date = new Date();
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return days[date.getDay()];
+  };
+
   useEffect(() => {
     const uid = "rayyanzaid0401@gmail.com";
 
@@ -44,7 +58,7 @@ export default function FullScheduleDisplay() {
     <SafeAreaView style={styles.container}>
       {scheduleDictionary ? (
         <View style={styles.container}>
-          <Text style={text_styles.titleText}>Monday</Text>
+          <Text style={text_styles.titleText}>{getDayOfWeek()}</Text>
           <ScrollView>
             <View>
               {Object.keys(scheduleDictionary).map((key) => (
