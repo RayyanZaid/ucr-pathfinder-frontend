@@ -19,7 +19,7 @@ import axios from "axios";
 import api from "../api";
 import EachCourse from "./EachCourse";
 
-export default function FullScheduleDisplay() {
+export default function OneDayScheduleDisplay() {
   const [scheduleDictionary, setScheduleDictionary] = useState(null);
 
   const getDayOfWeek = () => {
