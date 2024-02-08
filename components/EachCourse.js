@@ -57,7 +57,7 @@ export default function EachCourse({ courseData }) {
 
     const formattedEndTimePST = endTimePST.toLocaleString("en-US", options);
 
-    console.log(formattedStartTimePST);
+    // console.log(formattedStartTimePST);
 
     const timeRangeString = modifiedStartTime + " — " + formattedEndTimePST;
 
@@ -66,14 +66,29 @@ export default function EachCourse({ courseData }) {
 
   function getTeacherName() {
     const teacherName = courseData["teacherName"];
+    const nameLength = teacherName.length;
 
-    return teacherName;
+    let fontSize = 16; // Default font size
+    if (nameLength > 20) {
+      // If the length of teacherName is greater than 20 characters, decrease the font size
+      fontSize = 14;
+    }
+
+    return { name: teacherName, fontSize: fontSize };
   }
+
   return (
     <View style={styles.courseContainer}>
       <Text style={text_styles.scheduleCourseText}>{getCourseNumber()}</Text>
       <Text style={text_styles.locationText}> {getLocation()}</Text>
-      <Text style={text_styles.teacherText}> {getTeacherName()}</Text>
+      <Text
+        style={[
+          text_styles.teacherText,
+          { fontSize: getTeacherName().fontSize },
+        ]}
+      >
+        {getTeacherName().name}
+      </Text>
       <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
     </View>
   );
