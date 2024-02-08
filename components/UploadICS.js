@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
+    margin: 20,
   },
   uploadBox: {
     width: screenWidth * 0.6,

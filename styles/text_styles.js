@@ -11,6 +11,17 @@ const text_styles = StyleSheet.create({
     ...fontStyles,
     fontSize: 36,
     color: "black",
+    textAlign: "center",
+  },
+
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    ...fontStyles,
+    fontSize: screenHeight * 0.025,
+
+    margin: screenHeight * 0.005,
+    textAlign: "center",
   },
   input: {
     ...fontStyles,
