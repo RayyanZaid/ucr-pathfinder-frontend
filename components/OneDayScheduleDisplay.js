@@ -45,12 +45,12 @@ export default function OneDayScheduleDisplay({
                 ))}
               </View>
             </ScrollView>
-            <Icon
+            {/* <Icon
               name="arrow-down"
               size={30}
               color="#000"
               style={{ alignSelf: "center", marginBottom: 10 }}
-            />
+            /> */}
           </View>
         </View>
       ) : (
