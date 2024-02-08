@@ -29,9 +29,10 @@ export default function FullScheduleDisplay() {
         // Set initial position based on the current day, adjusted as necessary
         const date = new Date();
         const currentDayNumber = date.getDay() - 1;
-        setCurrentIndex(currentDayNumber); // Initialize currentIndex to the current day
+        // setCurrentIndex(currentDayNumber); // Initialize currentIndex to the current day
+        setCurrentIndex(0);
         const initialPosition = screenWidth * currentDayNumber;
-        scrollViewRef.current.scrollTo({ x: initialPosition, animated: false });
+        // scrollViewRef.current.scrollTo({ x: initialPosition, animated: false });
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
