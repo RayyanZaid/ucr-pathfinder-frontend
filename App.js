@@ -22,6 +22,21 @@ const coordinates = [
     latitude: 33.96942746772863,
     longitude: -117.33279650010662,
   },
+
+  {
+    latitude: 33.9755388,
+    longitude: -117.3263134,
+  },
+
+  {
+    latitude: 33.9753854,
+    longitude: -117.3272187,
+  },
+
+  {
+    latitude: 33.9740251,
+    longitude: -117.3303292,
+  },
 ];
 export default function App() {
   return (
@@ -29,18 +44,19 @@ export default function App() {
       style={styles.map}
       initialRegion={ucrRegion}
       provider={PROVIDER_GOOGLE}
+      mapType="satellite"
     >
-      <MapViewDirections
+      {/* <MapViewDirections
         apikey="AIzaSyCAtOelti_U6pD67Arv0sSBiKbNkb8_oCk"
-        origin={coordinates[0]}
-        destination={coordinates[1]}
+        origin={coordinates[2]}
+        destination={coordinates[4]}
         strokeWidth={3}
         onReady={(result) => {
           console.log("Distance: " + result.distance + " km");
           console.log("Duration: " + result.duration + " min.");
         }}
         mode="WALKING"
-      />
+      /> */}
     </MapView>
   );
 }
