@@ -38,13 +38,25 @@ export default function OneDayScheduleDisplay({
         <View style={styles.container}>
           <Text style={text_styles.titleText}>{getDayOfWeek(dayIndex)}</Text>
           <View style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1 }}>
-              <View>
-                {Object.keys(scheduleDictionary).map((key) => (
-                  <EachCourse key={key} courseData={scheduleDictionary[key]} />
-                ))}
+            {Object.keys(scheduleDictionary).length > 0 ? (
+              <ScrollView style={{ flex: 1 }}>
+                <View>
+                  {Object.keys(scheduleDictionary).map((key) => (
+                    <EachCourse
+                      key={key}
+                      courseData={scheduleDictionary[key]}
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <View style={styles.emtpyCourseContainer}>
+                <Text style={text_styles.titleText}>
+                  No clasess today. Yay!
+                </Text>
               </View>
-            </ScrollView>
+            )}
+
             {/* <Icon
               name="arrow-down"
               size={30}
@@ -67,5 +79,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: screenWidth * 0.05,
+  },
+  emtpyCourseContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: screenHeight * 0.03,
+
+    padding: 20,
+
+    width: screenWidth * 0.8,
+    height: screenHeight * 0.2,
   },
 });

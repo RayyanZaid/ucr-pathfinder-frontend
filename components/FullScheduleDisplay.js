@@ -47,7 +47,7 @@ export default function FullScheduleDisplay() {
 
   const scrollToCurrentDay = (dayIndex) => {
     const xPosition = dayIndex * screenWidth;
-    scrollViewRef.current.scrollTo({ x: xPosition, animated: false });
+    scrollViewRef.current.scrollTo({ x: xPosition, animated: true });
   };
 
   const scrollToNextDay = () => {
