@@ -14,10 +14,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const screenWidth = Dimensions.get("window").width;
 
 export default function FullScheduleDisplay() {
-  const [isSaved, setIsSaved] = useState(true);
   const [scheduleDictionaryArray, setScheduleDictionaryArray] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0); // New state to track current index
-
+  const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef();
 
   useEffect(() => {
@@ -26,18 +24,31 @@ export default function FullScheduleDisplay() {
       .get("/displaySchedule", { params: { uid } })
       .then((response) => {
         setScheduleDictionaryArray(response.data["scheduleDictionaryArray"]);
-        // Set initial position based on the current day, adjusted as necessary
         const date = new Date();
-        const currentDayNumber = date.getDay() - 1;
-        // setCurrentIndex(currentDayNumber); // Initialize currentIndex to the current day
-        setCurrentIndex(0);
-        const initialPosition = screenWidth * currentDayNumber;
-        // scrollViewRef.current.scrollTo({ x: initialPosition, animated: false });
+        let currentDayNumber = date.getDay(); // Get current day (0 for Sunday, 1 for Monday, etc.)
+
+        if (currentDayNumber < 1) {
+          currentDayNumber = 1; // If it's Sunday, set it to index 6 (last day of the week)
+        }
+
+        if (currentDayNumber > 5) {
+          currentDayNumber = 5;
+        }
+
+        currentDayNumber--;
+
+        setCurrentIndex(currentDayNumber); // Set currentIndex to the current day
+        scrollToCurrentDay(currentDayNumber);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
+
+  const scrollToCurrentDay = (dayIndex) => {
+    const xPosition = dayIndex * screenWidth;
+    scrollViewRef.current.scrollTo({ x: xPosition, animated: false });
+  };
 
   const scrollToNextDay = () => {
     const nextIndex = currentIndex + 1;
@@ -45,7 +56,7 @@ export default function FullScheduleDisplay() {
       x: screenWidth * nextIndex,
       animated: true,
     });
-    setCurrentIndex(nextIndex); // Update currentIndex accordingly
+    setCurrentIndex(nextIndex);
   };
 
   const scrollToPreviousDay = () => {
@@ -54,8 +65,10 @@ export default function FullScheduleDisplay() {
       x: screenWidth * prevIndex,
       animated: true,
     });
-    setCurrentIndex(prevIndex); // Update currentIndex accordingly
+    setCurrentIndex(prevIndex);
   };
+
+  console.log("Current Index:", currentIndex); // Log current index for debugging
 
   return (
     <View style={styles.container}>
@@ -72,12 +85,8 @@ export default function FullScheduleDisplay() {
         pagingEnabled={true}
         ref={scrollViewRef}
         showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e) => {
-          // Update currentIndex based on scroll position
-          const newIndex = Math.round(
-            e.nativeEvent.contentOffset.x / screenWidth
-          );
-          setCurrentIndex(newIndex);
+        onLayout={() => {
+          scrollToCurrentDay(currentIndex);
         }}
       >
         {scheduleDictionaryArray.map((schedule, index) => (
