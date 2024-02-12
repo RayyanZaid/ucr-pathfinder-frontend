@@ -69,7 +69,10 @@ export default function EachCourse({ courseData }) {
     const nameLength = teacherName.length;
 
     let fontSize = 16; // Default font size
-    if (nameLength > 20) {
+
+    if (nameLength > 30) {
+      fontSize = 10;
+    } else if (nameLength > 20) {
       // If the length of teacherName is greater than 20 characters, decrease the font size
       fontSize = 14;
     }
