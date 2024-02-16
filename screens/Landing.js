@@ -14,7 +14,9 @@ export default function LandingScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={text_styles.titleText}>Path to your next class</Text>
+      <Text style={text_styles.titleText}>
+        Path to your {sampleCourseData["className"]} class
+      </Text>
       <MapWithPath />
       <EachCourse courseData={sampleCourseData} />
     </View>
