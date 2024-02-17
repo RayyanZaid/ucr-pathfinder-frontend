@@ -1,4 +1,4 @@
-import MapView, { PROVIDER_GOOGLE, Polyline } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from "react-native-maps";
 import { Dimensions, StyleSheet, View, Text } from "react-native";
 
 import * as Location from "expo-location";
@@ -114,10 +114,30 @@ const MapWithPath = () => {
                 latitude: coord[0],
                 longitude: coord[1],
               }))}
-              strokeColor="#EC6D67" // black
+              strokeColor="#EC6D67" // red color for visibility
               strokeWidth={6}
             />
           ))}
+        {nodes && nodes.length > 0 && (
+          <Marker
+            coordinate={{
+              latitude: parseFloat(nodes[0].location[0]),
+              longitude: parseFloat(nodes[0].location[1]),
+            }}
+            title="Start"
+            pinColor="green" // Green color for start
+          />
+        )}
+        {nodes && nodes.length > 0 && (
+          <Marker
+            coordinate={{
+              latitude: parseFloat(nodes[nodes.length - 1].location[0]),
+              longitude: parseFloat(nodes[nodes.length - 1].location[1]),
+            }}
+            title={nodes[nodes.length - 1].name}
+            pinColor="blue"
+          />
+        )}
       </MapView>
       <Text style={text_styles.timeText}>ETA: {minutesNeeded} mins</Text>
     </View>
