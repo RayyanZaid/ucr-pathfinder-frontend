@@ -11,7 +11,7 @@ var ucrRegion = {
 
 const screenHeight = Dimensions.get("window").height;
 
-const MapWithPath = () => {
+const MapWithPath = ({ userLocation, nextCourseBuildingName }) => {
   return (
     <View style={styles.container}>
       <MapView
