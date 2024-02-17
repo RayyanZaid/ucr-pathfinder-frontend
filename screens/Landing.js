@@ -10,8 +10,6 @@ export default function LandingScreen() {
     className: "STATICS",
   };
 
-  function setPath() {}
-
   return (
     <View style={styles.container}>
       <Text style={text_styles.titleText}>

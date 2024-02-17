@@ -86,6 +86,18 @@ const text_styles = StyleSheet.create({
     left: 5,
     fontSize: 16,
   },
+
+  timeText: {
+    ...fontStyles,
+    fontSize: screenHeight * 0.03,
+    position: "absolute", // Use absolute positioning
+    top: 10, // Distance from the top of the parent View
+    right: 10, // Distance from the right of the parent View
+    color: "white", // Text color for better visibility (optional)
+    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background (optional)
+    padding: 8, // Padding around the text (optional)
+    borderRadius: 5, // Rounded corners for the background (optional)
+  },
 });
 
 export default text_styles;
