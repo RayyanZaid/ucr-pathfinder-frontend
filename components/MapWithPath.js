@@ -37,20 +37,6 @@ const MapWithPath = () => {
     setLocation(location);
   };
 
-  const getTimeAndDistance = async () => {
-    let cumulativeTime = 0;
-    let cumulativeDistance = 0;
-    for (let i = 0; i < edges.length; i++) {
-      let eachTime = edges[i]["time"];
-      let eachDistance = edges[i]["distance"];
-
-      cumulativeTime += eachTime;
-      cumulativeDistance += eachDistance;
-    }
-
-    setMinutesNeeded(Math.ceil(cumulativeTime));
-    setDistance(cumulativeDistance);
-  };
   const getPath = async () => {
     console.log("This runs every 1 second");
 
@@ -60,18 +46,14 @@ const MapWithPath = () => {
         if (response) {
           setNodes(response.data["nodes"]);
           setEdges(response.data["edges"]);
+          setMinutesNeeded(Math.ceil(response.data["totalTime"]));
+          setDistance(response.data["totalLength"]);
         }
       });
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    if (edges) {
-      // This checks if edges is not null
-      getTimeAndDistance(); // Now we call getTimeAndDistance
-    }
-  }, [edges]); // This useEffect depends on changes to edges
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,6 +122,7 @@ const MapWithPath = () => {
         )}
       </MapView>
       <Text style={text_styles.timeText}>ETA: {minutesNeeded} mins</Text>
+      <Text style={text_styles.distanceText}>{distance} ft</Text>
     </View>
   );
 };
