@@ -47,7 +47,7 @@ const MapWithPath = () => {
           setNodes(response.data["nodes"]);
           setEdges(response.data["edges"]);
           setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-          setDistance(response.data["totalLength"]);
+          setDistance(Math.ceil(response.data["totalLength"]));
         }
       });
     } catch (error) {
