@@ -1,5 +1,11 @@
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from "react-native-maps";
-import { Dimensions, StyleSheet, View, Text } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 
 import * as Location from "expo-location";
 import text_styles from "../styles/text_styles";
@@ -69,7 +75,6 @@ const MapWithPath = () => {
     // Clear the interval when the component unmounts
     return () => clearInterval(combinedInterval);
   }, []);
-
   let text = "Waiting..";
   if (errorMsg) {
     text = errorMsg;
@@ -77,6 +82,17 @@ const MapWithPath = () => {
     text = JSON.stringify(location);
   }
 
+  // Show loading indicator if nodes or edges are not loaded yet
+  if (!nodes || !edges) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={text_styles.titleText}>Loading map data...</Text>
+      </View>
+    );
+  }
+
+  // Main content with map and markers
   return (
     <View style={styles.container}>
       <MapView
@@ -131,7 +147,7 @@ const styles = StyleSheet.create({
   container: {
     height: "50%",
     width: "100%",
-    justifyContent: "flex-end",
+    justifyContent: "center",
     alignItems: "center",
     margin: screenHeight * 0.01,
     position: "relative",
