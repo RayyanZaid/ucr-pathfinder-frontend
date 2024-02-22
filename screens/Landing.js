@@ -41,8 +41,13 @@ export default function LandingScreen() {
       <Text style={text_styles.titleText}>
         Path to your {sampleCourseData["className"]} class
       </Text>
-      <MapWithPath classBuildingName={"University Lecture Hall (UNLH 1000)"} />
-      <EachCourse courseData={scheduleDictionaryArray[1][2]} />
+      <MapWithPath
+        classBuildingName={
+          scheduleDictionaryArray[3][0]["locationInfo"]["buildingName"]
+          // "Materials Sci and Engineering"
+        }
+      />
+      <EachCourse courseData={scheduleDictionaryArray[3][0]} />
     </View>
   );
 }
