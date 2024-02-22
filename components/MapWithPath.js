@@ -86,7 +86,7 @@ const MapWithPath = () => {
   if (!nodes || !edges) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="black" />
         <Text style={text_styles.titleText}>Loading map data...</Text>
       </View>
     );
