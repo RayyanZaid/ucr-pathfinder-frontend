@@ -21,8 +21,12 @@ var ucrRegion = {
 
 const screenHeight = Dimensions.get("window").height;
 
-const MapWithPath = () => {
+const MapWithPath = ({ classBuildingName }) => {
   const [location, setLocation] = useState(null);
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [altitude, setAltitude] = useState(null);
+
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [nodes, setNodes] = useState(null);
@@ -41,6 +45,9 @@ const MapWithPath = () => {
 
     let location = await Location.getCurrentPositionAsync({});
     setLocation(location);
+    setLatitude(location["coords"]["latitude"]);
+    setLongitude(location["coords"]["longitude"]);
+    setAltitude(location["coords"]["altitude"]);
   };
 
   const getPath = async () => {
@@ -48,14 +55,18 @@ const MapWithPath = () => {
 
     const uid = "rayyanzaid0401@gmail.com";
     try {
-      api.get("/getShortestPath", { params: { uid } }).then((response) => {
-        if (response) {
-          setNodes(response.data["nodes"]);
-          setEdges(response.data["edges"]);
-          setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-          setDistance(Math.ceil(response.data["totalLength"]));
-        }
-      });
+      api
+        .get("/getShortestPath", {
+          params: { uid, latitude, longitude, altitude, classBuildingName },
+        })
+        .then((response) => {
+          if (response) {
+            setNodes(response.data["nodes"]);
+            setEdges(response.data["edges"]);
+            setMinutesNeeded(Math.ceil(response.data["totalTime"]));
+            setDistance(Math.ceil(response.data["totalLength"]));
+          }
+        });
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +75,6 @@ const MapWithPath = () => {
   useEffect(() => {
     const fetchData = async () => {
       await fetchLocation(); // Wait for fetchLocation to complete
-      await getPath(); // Then call getPath
     };
 
     fetchData();
@@ -75,6 +85,16 @@ const MapWithPath = () => {
     // Clear the interval when the component unmounts
     return () => clearInterval(combinedInterval);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (location) {
+        await getPath(); // Call getPath only if location is not null
+      }
+    };
+    fetchData();
+  }, [location]); // This useEffect depends on the location state
+
   let text = "Waiting..";
   if (errorMsg) {
     text = errorMsg;
