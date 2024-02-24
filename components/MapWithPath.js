@@ -9,7 +9,7 @@ import {
 
 import * as Location from "expo-location";
 import text_styles from "../styles/text_styles";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../api";
 
 var ucrRegion = {
@@ -34,6 +34,27 @@ const MapWithPath = ({ classBuildingName }) => {
 
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
+
+  const mapRef = useRef(null); // Add this line to create a ref for your map
+
+  const adjustCamera = () => {
+    const coordinates = [
+      { latitude: latitude, longitude: longitude }, // User's location
+      { latitude: ucrRegion.latitude, longitude: ucrRegion.longitude }, // Center of ucrRegion
+      // Optionally, you can add more points here if you want to ensure other specific areas are visible
+    ];
+
+    mapRef.current?.fitToCoordinates(coordinates, {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+      animated: true,
+    });
+  };
+
+  useEffect(() => {
+    if (location && mapRef.current) {
+      adjustCamera();
+    }
+  }, [location]); // Adjust the camera when the location changes
 
   // Function to fetch location
   const fetchLocation = async () => {
@@ -116,6 +137,7 @@ const MapWithPath = ({ classBuildingName }) => {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={ucrRegion}
         provider={PROVIDER_GOOGLE}
