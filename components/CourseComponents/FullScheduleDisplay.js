@@ -8,8 +8,8 @@ import {
   Dimensions,
 } from "react-native";
 
-import OneDayScheduleDisplay from "../components/OneDayScheduleDisplay";
-import api from "../api";
+import OneDayScheduleDisplay from "../CourseComponents/OneDayScheduleDisplay";
+import api from "../../api";
 import Icon from "react-native-vector-icons/FontAwesome";
 const screenWidth = Dimensions.get("window").width;
 

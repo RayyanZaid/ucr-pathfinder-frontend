@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { Linking, StyleSheet, Text, View } from "react-native";
 import UploadICS from "../components/UploadICS";
 import { useState } from "react";
-import FullScheduleDisplay from "../components/FullScheduleDisplay";
+import FullScheduleDisplay from "../components/CourseComponents/FullScheduleDisplay";
 import text_styles from "../styles/text_styles";
 
 export default function ScheduleScreen() {

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Dimensions, Button } from "react-native";
 import React from "react";
-import text_styles from "../styles/text_styles";
+import text_styles from "../../styles/text_styles";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;

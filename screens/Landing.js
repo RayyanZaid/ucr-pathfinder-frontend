@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import text_styles from "../styles/text_styles";
 import MapWithPath from "../components/MapWithPath";
-import EachCourse from "../components/EachCourse";
+import EachCourse from "../components/CourseComponents/EachCourse";
 import { useEffect, useState } from "react";
 import api from "../api";
 export default function LandingScreen() {

@@ -137,7 +137,7 @@ const MapWithPath = ({ classBuildingName }) => {
   return (
     <View style={styles.container}>
       <MapView
-        ref={mapRef}
+        // ref={mapRef}
         style={styles.map}
         initialRegion={ucrRegion}
         provider={PROVIDER_GOOGLE}
