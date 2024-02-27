@@ -13,10 +13,10 @@ import { StatusBar } from "expo-status-bar";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 
-import button_styles from "../styles/button_styles";
-import text_styles from "../styles/text_styles";
+import button_styles from "../../styles/button_styles";
+import text_styles from "../../styles/text_styles";
 import axios from "axios";
-import api from "../api";
+import api from "../../api";
 import EachCourse from "./EachCourse";
 
 const screenWidth = Dimensions.get("window").width;

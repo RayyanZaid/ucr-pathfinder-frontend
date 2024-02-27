@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import ScheduleScreen from "./screens/Schedule";
 
 import { useFonts } from "expo-font";
+import LandingScreen from "./screens/Landing";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -12,8 +13,8 @@ export default function App() {
   if (fontsLoaded) {
     return (
       <View style={styles.container}>
-        <ScheduleScreen />
-
+        {/* <ScheduleScreen /> */}
+        <LandingScreen />
         <StatusBar style="auto" />
       </View>
     );
