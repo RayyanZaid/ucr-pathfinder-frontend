@@ -1,55 +1,77 @@
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import text_styles from "../styles/text_styles";
-import MapWithPath from "../components/MapWithPath";
+import MapWithPath from "../components/Map";
 import EachCourse from "../components/CourseComponents/EachCourse";
 import { useEffect, useState } from "react";
 import api from "../api";
+import button_styles from "../styles/button_styles";
 export default function LandingScreen() {
   // replace with local storage schedule later
-  const [scheduleDictionaryArray, setScheduleDictionaryArray] = useState([]);
+  const [nextClass, setNextClass] = useState(null);
+  const [isInNavigation, setIsInNavigation] = useState(false);
 
-  var sampleCourseData = {
-    courseNumber: "ME 010 001",
-    teacherName: "Mentzel, Tamar (Primary) Rudnicki, Chris\n",
-    className: "STATICS",
-  };
-
+  // This gets the student's next class. Right now it's just a mock class. Need to implement in the backend
   useEffect(() => {
     const uid = "rayyanzaid0401@gmail.com";
     api
-      .get("/displaySchedule", { params: { uid } })
+      .get("/getNextClass", { params: { uid } })
       .then((response) => {
-        setScheduleDictionaryArray(response.data["scheduleDictionaryArray"]);
-
-        // console.log(scheduleDictionaryArray[1][2]);
+        setNextClass(response.data["nextClass"]);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
 
-  if (scheduleDictionaryArray.length == 0) {
+  const toggleNavigation = () => {
+    setIsInNavigation(!isInNavigation);
+  };
+
+  if (!nextClass) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="black" />
         <Text style={text_styles.titleText}>Loading your next class</Text>
       </View>
     );
+  } else {
+    return (
+      <View style={styles.container}>
+        {!isInNavigation ? (
+          <>
+            <Text style={text_styles.titleText}>
+              Path to your {nextClass["courseNumber"]} class
+            </Text>
+            <MapWithPath
+              classBuildingName={nextClass["locationInfo"]["buildingName"]}
+            />
+
+            <Button
+              onPress={toggleNavigation}
+              title="Start Navigation"
+              style={button_styles.mediumButton}
+            />
+            <EachCourse courseData={nextClass} />
+          </>
+        ) : (
+          <>
+            <Text style={text_styles.titleText}>In Navigation</Text>
+            <Button
+              onPress={toggleNavigation}
+              title="Cancel Navigation"
+              style={button_styles.mediumButton}
+            />
+          </>
+        )}
+      </View>
+    );
   }
-  return (
-    <View style={styles.container}>
-      <Text style={text_styles.titleText}>
-        Path to your {sampleCourseData["className"]} class
-      </Text>
-      <MapWithPath
-        classBuildingName={
-          scheduleDictionaryArray[3][0]["locationInfo"]["buildingName"]
-          // "Materials Sci and Engineering"
-        }
-      />
-      <EachCourse courseData={scheduleDictionaryArray[3][0]} />
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({

@@ -35,27 +35,6 @@ const MapWithPath = ({ classBuildingName }) => {
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
 
-  const mapRef = useRef(null); // Add this line to create a ref for your map
-
-  const adjustCamera = () => {
-    const coordinates = [
-      { latitude: latitude, longitude: longitude }, // User's location
-      { latitude: ucrRegion.latitude, longitude: ucrRegion.longitude }, // Center of ucrRegion
-      // Optionally, you can add more points here if you want to ensure other specific areas are visible
-    ];
-
-    mapRef.current?.fitToCoordinates(coordinates, {
-      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-      animated: true,
-    });
-  };
-
-  useEffect(() => {
-    if (location && mapRef.current) {
-      adjustCamera();
-    }
-  }, [location]); // Adjust the camera when the location changes
-
   // Function to fetch location
   const fetchLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -71,7 +50,7 @@ const MapWithPath = ({ classBuildingName }) => {
     setAltitude(location["coords"]["altitude"]);
   };
 
-  const getPath = async () => {
+  const getNavigationData = async () => {
     console.log("This runs every 1 second");
 
     const uid = "rayyanzaid0401@gmail.com";
@@ -93,35 +72,23 @@ const MapWithPath = ({ classBuildingName }) => {
     }
   };
 
+  // This useEffect gets the location every 30 seconds
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchLocation(); // Wait for fetchLocation to complete
-    };
-
-    fetchData();
+    fetchLocation(); // Wait for fetchLocation to complete
 
     // Then set up the interval to repeat both in sequence every second
-    const combinedInterval = setInterval(fetchData, 1000);
+    const locationFetchInterval = setInterval(fetchLocation, 30000);
 
     // Clear the interval when the component unmounts
-    return () => clearInterval(combinedInterval);
+    return () => clearInterval(locationFetchInterval);
   }, []);
 
+  // This useEffect depends on the location state
   useEffect(() => {
-    const fetchData = async () => {
-      if (location) {
-        await getPath(); // Call getPath only if location is not null
-      }
-    };
-    fetchData();
-  }, [location]); // This useEffect depends on the location state
-
-  let text = "Waiting..";
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
+    if (location) {
+      getNavigationData();
+    }
+  }, [location]);
 
   // Show loading indicator if nodes or edges are not loaded yet
   if (!nodes || !edges) {
@@ -137,7 +104,6 @@ const MapWithPath = ({ classBuildingName }) => {
   return (
     <View style={styles.container}>
       <MapView
-        // ref={mapRef}
         style={styles.map}
         initialRegion={ucrRegion}
         provider={PROVIDER_GOOGLE}
