@@ -30,6 +30,10 @@ export default function LandingScreen() {
   const [nextClass, setNextClass] = useState(null);
   const [isInNavigation, setIsInNavigation] = useState(false);
 
+  const toggleNavigation = () => {
+    setIsInNavigation(!isInNavigation);
+  };
+
   // Location State Variables
 
   const [location, setLocation] = useState(null);
@@ -44,10 +48,8 @@ export default function LandingScreen() {
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
 
-  // Fetching user's current location
   useEffect(() => {
-    console.log("Getting User Location");
-    const fetchLocation = async () => {
+    const fetchLocationAndGetNavigation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         console.error("Permission to access location was denied");
@@ -59,65 +61,64 @@ export default function LandingScreen() {
       setLatitude(location.coords.latitude);
       setLongitude(location.coords.longitude);
       setAltitude(location.coords.altitude);
-    };
 
-    fetchLocation();
-
-    const locationFetchInterval = setInterval(fetchLocation, 1000);
-
-    return () => clearInterval(locationFetchInterval);
-  }, []);
-
-  // Fetching the next class data
-  useEffect(() => {
-    const fetchNextClass = async () => {
-      const uid = "rayyanzaid0401@gmail.com";
+      // Assuming getNextClass and getNavigation are now async functions or handle their promises.
       try {
-        const response = await api.get("/getNextClass", { params: { uid } });
-        setNextClass(response.data["nextClass"]);
+        const nextClassData = await getNextClass(); // Modify to actually fetch or simulate fetching data
+        setNextClass(nextClassData);
+
+        if (nextClassData && location.coords) {
+          await getNavigationData(nextClassData, location.coords);
+        }
       } catch (error) {
-        console.error("Error fetching next class data:", error);
+        console.error("Error in sequence operations:", error);
       }
     };
 
-    fetchNextClass();
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 1000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    // Directly check if all required data is present
-    if (
-      nextClass &&
-      latitude != null &&
-      longitude != null &&
-      altitude != null
-    ) {
-      getNavigationData();
-    }
-  }, [nextClass, latitude, longitude, altitude]);
-
-  const toggleNavigation = () => {
-    setIsInNavigation(!isInNavigation);
-  };
-
-  const getNavigationData = async () => {
+  // Assuming this function now accepts parameters and fetches data based on them
+  const getNavigationData = async (nextClassData, coords) => {
     console.log("Getting Navigation data from backend");
     const uid = "rayyanzaid0401@gmail.com";
-    let classBuildingName = nextClass["locationInfo"]["buildingName"];
+    let classBuildingName = nextClassData["locationInfo"]["buildingName"];
+
     try {
-      api
-        .get("/getShortestPath", {
-          params: { uid, latitude, longitude, altitude, classBuildingName },
-        })
-        .then((response) => {
-          if (response) {
-            setNodes(response.data["nodes"]);
-            setEdges(response.data["edges"]);
-            setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-            setDistance(Math.ceil(response.data["totalLength"]));
-          }
-        });
+      const response = await api.get("/getShortestPath", {
+        params: {
+          uid,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          altitude: coords.altitude,
+          classBuildingName,
+        },
+      });
+      if (response) {
+        setNodes(response.data["nodes"]);
+        setEdges(response.data["edges"]);
+        setMinutesNeeded(Math.ceil(response.data["totalTime"]));
+        setDistance(Math.ceil(response.data["totalLength"]));
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching navigation data:", error);
+    }
+  };
+
+  const getNextClass = async () => {
+    const uid = "rayyanzaid0401@gmail.com"; // This should ideally be dynamic or fetched from user context.
+    try {
+      const response = await api.get("/getNextClass", { params: { uid } });
+      if (response.data && response.data.nextClass) {
+        return response.data.nextClass;
+      }
+      console.error("No next class data found.");
+      return null;
+    } catch (error) {
+      console.error("Error fetching next class data:", error);
+      return null;
     }
   };
 
