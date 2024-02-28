@@ -62,9 +62,8 @@ export default function LandingScreen() {
       setLongitude(location.coords.longitude);
       setAltitude(location.coords.altitude);
 
-      // Assuming getNextClass and getNavigation are now async functions or handle their promises.
       try {
-        const nextClassData = await getNextClass(); // Modify to actually fetch or simulate fetching data
+        const nextClassData = await getNextClass();
         setNextClass(nextClassData);
 
         if (nextClassData && location.coords) {
@@ -75,12 +74,12 @@ export default function LandingScreen() {
       }
     };
 
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 1000);
+    // Fetches user location every 3 seconds
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 3000);
 
     return () => clearInterval(intervalId);
   }, []);
 
-  // Assuming this function now accepts parameters and fetches data based on them
   const getNavigationData = async (nextClassData, coords) => {
     console.log("Getting Navigation data from backend");
     const uid = "rayyanzaid0401@gmail.com";
@@ -108,7 +107,7 @@ export default function LandingScreen() {
   };
 
   const getNextClass = async () => {
-    const uid = "rayyanzaid0401@gmail.com"; // This should ideally be dynamic or fetched from user context.
+    const uid = "rayyanzaid0401@gmail.com";
     try {
       const response = await api.get("/getNextClass", { params: { uid } });
       if (response.data && response.data.nextClass) {
