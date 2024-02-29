@@ -28,7 +28,7 @@ const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
         provider={PROVIDER_GOOGLE}
         showsUserLocation
         showsMyLocationButton
-        mapType="satellite"
+        mapType="hybrid"
       >
         {edges &&
           nodes &&
