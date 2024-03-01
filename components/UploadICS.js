@@ -18,7 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome"; // Import the icon com
 import button_styles from "../styles/button_styles";
 import text_styles from "../styles/text_styles";
 
-import getFromAsyncStorage from "../functions/getFromAsyncStorage";
+import saveToAsyncStorage from "../functions/saveToAsyncStorage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -61,8 +61,6 @@ export default function UploadICS({ onIsSavedChange }) {
         const response = await api.post("/upload", formData);
 
         if (response.data.message === "File successfully uploaded") {
-          setIsSaved(true);
-          onIsSavedChange(true);
           await getScheduleFromFirebase();
         }
 
@@ -77,20 +75,25 @@ export default function UploadICS({ onIsSavedChange }) {
     console.log("Getting Schedule From Firebase");
     try {
       const uid = "rayyanzaid0401@gmail.com";
-      api.get("/displaySchedule", { params: { uid } }).then((response) => {
-        // console.log(response.data["scheduleDictionaryArray"]);
-        console.log("Got schedule from backend");
+      api
+        .get("/displaySchedule", { params: { uid } })
+        .then(async (response) => {
+          // console.log(response.data["scheduleDictionaryArray"]);
+          console.log("Got schedule from backend");
 
-        try {
-          saveToAsyncStorage(
-            key,
-            JSON.stringify(response.data["scheduleDictionaryArray"])
-          );
-          console.log("Saved schedule to Async Storage");
-        } catch (error) {
-          console.log("Error while saving to Async:", error);
-        }
-      });
+          try {
+            await saveToAsyncStorage(
+              "Schedule",
+              JSON.stringify(response.data["scheduleDictionaryArray"])
+            );
+            setIsSaved(true);
+
+            onIsSavedChange(true); // Inform the parent component that the save operation has completed
+            console.log("Saved schedule to Async Storage");
+          } catch (error) {
+            console.log("Error while saving to Async:", error);
+          }
+        });
     } catch (error) {
       console.log("Error in overall function:", error);
     }

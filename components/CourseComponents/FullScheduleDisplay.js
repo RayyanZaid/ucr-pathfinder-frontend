@@ -6,15 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Button,
 } from "react-native";
 
 import OneDayScheduleDisplay from "../CourseComponents/OneDayScheduleDisplay";
-import api from "../../api";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 import getFromAsyncStorage from "../../functions/getFromAsyncStorage";
 const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 
 export default function FullScheduleDisplay() {
   const [scheduleDictionaryArray, setScheduleDictionaryArray] = useState([]);
@@ -24,29 +23,26 @@ export default function FullScheduleDisplay() {
   useEffect(() => {
     async function fetchSchedule() {
       const schedule = await getFromAsyncStorage("Schedule");
-
-      // Assuming you want to set the schedule to state after fetching
-      setScheduleDictionaryArray(schedule);
+      setScheduleDictionaryArray(schedule || []);
 
       const date = new Date();
-      let currentDayNumber = date.getDay(); // Get current day (0 for Sunday, 1 for Monday, etc.)
+      let currentDayNumber = date.getDay();
 
       if (currentDayNumber < 1) {
-        currentDayNumber = 1; // If it's Sunday, set it to index 6 (last day of the week)
+        currentDayNumber = 1;
       }
 
       if (currentDayNumber > 5) {
-        currentDayNumber = 5; // Adjust based on your scheduling needs
+        currentDayNumber = 5;
       }
 
-      currentDayNumber--; // Adjust because your logic seems to want a 0-based index
-
-      setCurrentIndex(currentDayNumber); // Set currentIndex to the current day
+      currentDayNumber--;
+      setCurrentIndex(currentDayNumber);
       scrollToCurrentDay(currentDayNumber);
     }
 
     fetchSchedule();
-  }, []); // The empty array means this effect runs once after the initial render
+  }, []);
 
   const scrollToCurrentDay = (dayIndex) => {
     const xPosition = dayIndex * screenWidth;
@@ -70,8 +66,6 @@ export default function FullScheduleDisplay() {
     });
     setCurrentIndex(prevIndex);
   };
-
-  console.log("Current Index:", currentIndex); // Log current index for debugging
 
   return (
     <View style={styles.container}>
