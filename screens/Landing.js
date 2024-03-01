@@ -28,6 +28,7 @@ export default function LandingScreen() {
   // State Variables
 
   const [nextClass, setNextClass] = useState(null);
+
   const [isInNavigation, setIsInNavigation] = useState(false);
 
   const toggleNavigation = () => {
@@ -64,7 +65,12 @@ export default function LandingScreen() {
 
       try {
         const nextClassData = await getNextClass();
-        setNextClass(nextClassData);
+
+        if (nextClassData != null) {
+          setNextClass(nextClassData);
+        } else {
+          console.log("No classes today");
+        }
 
         if (nextClassData && location.coords) {
           await getNavigationData(nextClassData, location.coords);
@@ -107,16 +113,49 @@ export default function LandingScreen() {
   };
 
   const getNextClass = async () => {
-    const uid = "rayyanzaid0401@gmail.com";
-    try {
-      const response = await api.get("/getNextClass", { params: { uid } });
-      if (response.data && response.data.nextClass) {
-        return response.data.nextClass;
-      }
-      console.error("No next class data found.");
-      return null;
-    } catch (error) {
-      console.error("Error fetching next class data:", error);
+    const now = new Date();
+    // Adjust current time to PST for comparison
+
+    let schedule = await getFromAsyncStorage("Schedule");
+
+    // Assuming the day index is correct
+    let currentDayNumber = now.getDay();
+    let scheduleCurrentDayIndex = currentDayNumber - 1;
+    let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
+
+    if (currentDayClasses.length === 0) {
+      console.log("No classes today");
+      return;
+    }
+
+    const nextClass = currentDayClasses.find((eachClass) => {
+      const classStartTimeString = eachClass["timeInfo"]["startTime"];
+      console.log(eachClass["courseNumber"]);
+      const classStartTimeDateObject = new Date(classStartTimeString);
+
+      // Extract hours and minutes for current time in PST
+      const currentHoursPST = now.getHours();
+      const currentMinutesPST = now.getMinutes();
+      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+
+      // Extract hours and minutes for class start time in PST
+      const classStartHoursPST = classStartTimeDateObject.getHours();
+      const classStartMinutesPST = classStartTimeDateObject.getMinutes();
+      const classStartTimeInMinutesPST =
+        classStartHoursPST * 60 + classStartMinutesPST;
+      console.log(classStartHoursPST);
+      // Compare only the time part (in minutes) to find the next class
+      return classStartTimeInMinutesPST > currentTimeInMinutesPST;
+    });
+
+    if (nextClass) {
+      // Make Materials Sci until we finish Google Earth
+      nextClass["locationInfo"]["buildingName"] =
+        "Materials Sci and Engineering";
+      console.log("Next class:", nextClass);
+      return nextClass;
+    } else {
+      console.log("No more classes for today.");
       return null;
     }
   };

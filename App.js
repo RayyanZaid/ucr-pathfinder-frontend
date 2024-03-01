@@ -13,8 +13,8 @@ export default function App() {
   if (fontsLoaded) {
     return (
       <View style={styles.container}>
-        <ScheduleScreen />
-        {/* <LandingScreen /> */}
+        {/* <ScheduleScreen /> */}
+        <LandingScreen />
         <StatusBar style="auto" />
       </View>
     );
