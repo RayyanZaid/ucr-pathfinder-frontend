@@ -9,9 +9,11 @@ import {
 } from "react-native";
 
 import OneDayScheduleDisplay from "../CourseComponents/OneDayScheduleDisplay";
-import api from "../../api";
 import Icon from "react-native-vector-icons/FontAwesome";
+
+import getFromAsyncStorage from "../../functions/getFromAsyncStorage";
 const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 
 export default function FullScheduleDisplay() {
   const [scheduleDictionaryArray, setScheduleDictionaryArray] = useState([]);
@@ -19,30 +21,27 @@ export default function FullScheduleDisplay() {
   const scrollViewRef = useRef();
 
   useEffect(() => {
-    const uid = "rayyanzaid0401@gmail.com";
-    api
-      .get("/displaySchedule", { params: { uid } })
-      .then((response) => {
-        setScheduleDictionaryArray(response.data["scheduleDictionaryArray"]);
-        const date = new Date();
-        let currentDayNumber = date.getDay(); // Get current day (0 for Sunday, 1 for Monday, etc.)
+    async function fetchSchedule() {
+      const schedule = await getFromAsyncStorage("Schedule");
+      setScheduleDictionaryArray(schedule || []);
 
-        if (currentDayNumber < 1) {
-          currentDayNumber = 1; // If it's Sunday, set it to index 6 (last day of the week)
-        }
+      const date = new Date();
+      let currentDayNumber = date.getDay();
 
-        if (currentDayNumber > 5) {
-          currentDayNumber = 5;
-        }
+      if (currentDayNumber < 1) {
+        currentDayNumber = 1;
+      }
 
-        currentDayNumber--;
+      if (currentDayNumber > 5) {
+        currentDayNumber = 5;
+      }
 
-        setCurrentIndex(currentDayNumber); // Set currentIndex to the current day
-        scrollToCurrentDay(currentDayNumber);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+      currentDayNumber--;
+      setCurrentIndex(currentDayNumber);
+      scrollToCurrentDay(currentDayNumber);
+    }
+
+    fetchSchedule();
   }, []);
 
   const scrollToCurrentDay = (dayIndex) => {
@@ -68,8 +67,6 @@ export default function FullScheduleDisplay() {
     setCurrentIndex(prevIndex);
   };
 
-  console.log("Current Index:", currentIndex); // Log current index for debugging
-
   return (
     <View style={styles.container}>
       {currentIndex > 0 && (
@@ -80,6 +77,7 @@ export default function FullScheduleDisplay() {
           <Icon name="arrow-left" size={30} color="#000" />
         </TouchableOpacity>
       )}
+
       <ScrollView
         horizontal={true}
         pagingEnabled={true}
