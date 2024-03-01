@@ -87,7 +87,7 @@ export default function LandingScreen() {
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
-    if (nextClass != "No classes today" && nextClass != null) {
+    if (nextClass != "No classes today") {
       console.log("Getting Navigation data from backend");
       const uid = "rayyanzaid0401@gmail.com";
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
