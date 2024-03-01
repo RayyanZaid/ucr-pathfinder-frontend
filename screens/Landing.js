@@ -65,7 +65,12 @@ export default function LandingScreen() {
 
       try {
         const nextClassData = await getNextClass();
-        setNextClass(nextClassData);
+
+        if (nextClassData != null) {
+          setNextClass(nextClassData);
+        } else {
+          console.log("No classes today");
+        }
 
         if (nextClassData && location.coords) {
           await getNavigationData(nextClassData, location.coords);
@@ -151,6 +156,7 @@ export default function LandingScreen() {
       return nextClass;
     } else {
       console.log("No more classes for today.");
+      return null;
     }
   };
 
