@@ -28,6 +28,7 @@ export default function LandingScreen() {
   // State Variables
 
   const [nextClass, setNextClass] = useState(null);
+
   const [isInNavigation, setIsInNavigation] = useState(false);
 
   const toggleNavigation = () => {
@@ -106,18 +107,53 @@ export default function LandingScreen() {
     }
   };
 
+  // Function to adjust Date object to PST (UTC-8) for display purposes
+  function convertToPST(dateObj) {
+    // Calculate the time offset in milliseconds (8 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+    const offset = 8 * 60 * 60 * 1000;
+    // Create a new Date object adjusted for PST
+    const pstDate = new Date(dateObj.getTime() - offset);
+
+    // Format the date for display (optional, for clarity)
+    // Note: This is just for display, the Date object remains in local time
+    return pstDate.toISOString().replace("Z", " PST"); // ISO string adjusted for PST
+  }
+
   const getNextClass = async () => {
-    const uid = "rayyanzaid0401@gmail.com";
-    try {
-      const response = await api.get("/getNextClass", { params: { uid } });
-      if (response.data && response.data.nextClass) {
-        return response.data.nextClass;
-      }
-      console.error("No next class data found.");
-      return null;
-    } catch (error) {
-      console.error("Error fetching next class data:", error);
-      return null;
+    const now = new Date();
+    const currentTimePST = convertToPST(now);
+    console.log(currentTimePST);
+    // Get the current time in hours and minutes
+    const currentHours = now.getUTCHours();
+    const currentMinutes = now.getUTCMinutes();
+
+    let schedule = await getFromAsyncStorage("Schedule");
+
+    // Adjusting the index if necessary
+    let currentDayNumber = now.getUTCDay();
+    let scheduleCurrentDayIndex = currentDayNumber - 1;
+    let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
+
+    if (currentDayClasses.length === 0) {
+      console.log("No classes today");
+      return; // Exit if there are no classes today
+    }
+
+    // Process to find the next class based on time comparison
+    const nextClass = currentDayClasses.find((eachClass) => {
+      // Convert the startTime to a Date object
+      const classStartTimeString = eachClass["timeInfo"]["startTime"];
+      const classStartTimeDataObject = new Date(classStartTimeString);
+
+      // Convert and display the date in PST
+      const pstDateDisplay = convertToPST(classStartTimeDataObject);
+      console.log(pstDateDisplay);
+    });
+
+    if (nextClass) {
+      console.log("Next class:", nextClass);
+    } else {
+      console.log("No more classes for today.");
     }
   };
 

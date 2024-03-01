@@ -36,19 +36,8 @@ export default function EachCourse({ courseData }) {
     const endTimeString = timeInfoDict["endTime"];
     const startTimeString = timeInfoDict["startTime"];
 
-    const startTimeGMT = new Date(startTimeString);
-    const endTimeGMT = new Date(endTimeString);
-
-    // Set the desired time zone (PST)
-    const timeZoneOffset = 0;
-
-    // Convert to PST by adding the time zone offset in minutes
-    const startTimePST = new Date(
-      startTimeGMT.getTime() + timeZoneOffset * 60 * 1000
-    );
-    const endTimePST = new Date(
-      endTimeGMT.getTime() + timeZoneOffset * 60 * 1000
-    );
+    const startTimePST = new Date(startTimeString);
+    const endTimePST = new Date(endTimeString);
 
     // Format the PST times as strings
     const options = {
