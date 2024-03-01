@@ -107,51 +107,48 @@ export default function LandingScreen() {
     }
   };
 
-  // Function to adjust Date object to PST (UTC-8) for display purposes
-  function convertToPST(dateObj) {
-    // Calculate the time offset in milliseconds (8 hours * 60 minutes * 60 seconds * 1000 milliseconds)
-    const offset = 8 * 60 * 60 * 1000;
-    // Create a new Date object adjusted for PST
-    const pstDate = new Date(dateObj.getTime() - offset);
-
-    // Format the date for display (optional, for clarity)
-    // Note: This is just for display, the Date object remains in local time
-    return pstDate.toISOString().replace("Z", " PST"); // ISO string adjusted for PST
-  }
-
   const getNextClass = async () => {
     const now = new Date();
-    const currentTimePST = convertToPST(now);
-    console.log(currentTimePST);
-    // Get the current time in hours and minutes
-    const currentHours = now.getUTCHours();
-    const currentMinutes = now.getUTCMinutes();
+    // Adjust current time to PST for comparison
 
     let schedule = await getFromAsyncStorage("Schedule");
 
-    // Adjusting the index if necessary
-    let currentDayNumber = now.getUTCDay();
+    // Assuming the day index is correct
+    let currentDayNumber = now.getDay();
     let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
       console.log("No classes today");
-      return; // Exit if there are no classes today
+      return;
     }
 
-    // Process to find the next class based on time comparison
     const nextClass = currentDayClasses.find((eachClass) => {
-      // Convert the startTime to a Date object
       const classStartTimeString = eachClass["timeInfo"]["startTime"];
-      const classStartTimeDataObject = new Date(classStartTimeString);
+      console.log(eachClass["courseNumber"]);
+      const classStartTimeDateObject = new Date(classStartTimeString);
 
-      // Convert and display the date in PST
-      const pstDateDisplay = convertToPST(classStartTimeDataObject);
-      console.log(pstDateDisplay);
+      // Extract hours and minutes for current time in PST
+      const currentHoursPST = now.getHours();
+      const currentMinutesPST = now.getMinutes();
+      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+
+      // Extract hours and minutes for class start time in PST
+      const classStartHoursPST = classStartTimeDateObject.getHours();
+      const classStartMinutesPST = classStartTimeDateObject.getMinutes();
+      const classStartTimeInMinutesPST =
+        classStartHoursPST * 60 + classStartMinutesPST;
+      console.log(classStartHoursPST);
+      // Compare only the time part (in minutes) to find the next class
+      return classStartTimeInMinutesPST > currentTimeInMinutesPST;
     });
 
     if (nextClass) {
+      // Make Materials Sci until we finish Google Earth
+      nextClass["locationInfo"]["buildingName"] =
+        "Materials Sci and Engineering";
       console.log("Next class:", nextClass);
+      return nextClass;
     } else {
       console.log("No more classes for today.");
     }
