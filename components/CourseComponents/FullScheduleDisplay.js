@@ -6,11 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Button,
 } from "react-native";
 
 import OneDayScheduleDisplay from "../CourseComponents/OneDayScheduleDisplay";
 import api from "../../api";
 import Icon from "react-native-vector-icons/FontAwesome";
+
+import getFromAsyncStorage from "../../functions/getFromAsyncStorage";
 const screenWidth = Dimensions.get("window").width;
 
 export default function FullScheduleDisplay() {
@@ -19,31 +22,31 @@ export default function FullScheduleDisplay() {
   const scrollViewRef = useRef();
 
   useEffect(() => {
-    const uid = "rayyanzaid0401@gmail.com";
-    api
-      .get("/displaySchedule", { params: { uid } })
-      .then((response) => {
-        setScheduleDictionaryArray(response.data["scheduleDictionaryArray"]);
-        const date = new Date();
-        let currentDayNumber = date.getDay(); // Get current day (0 for Sunday, 1 for Monday, etc.)
+    async function fetchSchedule() {
+      const schedule = await getFromAsyncStorage("Schedule");
 
-        if (currentDayNumber < 1) {
-          currentDayNumber = 1; // If it's Sunday, set it to index 6 (last day of the week)
-        }
+      // Assuming you want to set the schedule to state after fetching
+      setScheduleDictionaryArray(schedule);
 
-        if (currentDayNumber > 5) {
-          currentDayNumber = 5;
-        }
+      const date = new Date();
+      let currentDayNumber = date.getDay(); // Get current day (0 for Sunday, 1 for Monday, etc.)
 
-        currentDayNumber--;
+      if (currentDayNumber < 1) {
+        currentDayNumber = 1; // If it's Sunday, set it to index 6 (last day of the week)
+      }
 
-        setCurrentIndex(currentDayNumber); // Set currentIndex to the current day
-        scrollToCurrentDay(currentDayNumber);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, []);
+      if (currentDayNumber > 5) {
+        currentDayNumber = 5; // Adjust based on your scheduling needs
+      }
+
+      currentDayNumber--; // Adjust because your logic seems to want a 0-based index
+
+      setCurrentIndex(currentDayNumber); // Set currentIndex to the current day
+      scrollToCurrentDay(currentDayNumber);
+    }
+
+    fetchSchedule();
+  }, []); // The empty array means this effect runs once after the initial render
 
   const scrollToCurrentDay = (dayIndex) => {
     const xPosition = dayIndex * screenWidth;
@@ -80,6 +83,7 @@ export default function FullScheduleDisplay() {
           <Icon name="arrow-left" size={30} color="#000" />
         </TouchableOpacity>
       )}
+
       <ScrollView
         horizontal={true}
         pagingEnabled={true}
