@@ -69,7 +69,7 @@ export default function LandingScreen() {
         if (nextClassData != null) {
           setNextClass(nextClassData);
         } else {
-          console.log("No classes today");
+          return;
         }
 
         if (nextClassData && location.coords) {
@@ -87,28 +87,30 @@ export default function LandingScreen() {
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
-    console.log("Getting Navigation data from backend");
-    const uid = "rayyanzaid0401@gmail.com";
-    let classBuildingName = nextClassData["locationInfo"]["buildingName"];
+    if (nextClass != "No classes today" && nextClass != null) {
+      console.log("Getting Navigation data from backend");
+      const uid = "rayyanzaid0401@gmail.com";
+      let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
-    try {
-      const response = await api.get("/getShortestPath", {
-        params: {
-          uid,
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          altitude: coords.altitude,
-          classBuildingName,
-        },
-      });
-      if (response) {
-        setNodes(response.data["nodes"]);
-        setEdges(response.data["edges"]);
-        setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-        setDistance(Math.ceil(response.data["totalLength"]));
+      try {
+        const response = await api.get("/getShortestPath", {
+          params: {
+            uid,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            altitude: coords.altitude,
+            classBuildingName,
+          },
+        });
+        if (response) {
+          setNodes(response.data["nodes"]);
+          setEdges(response.data["edges"]);
+          setMinutesNeeded(Math.ceil(response.data["totalTime"]));
+          setDistance(Math.ceil(response.data["totalLength"]));
+        }
+      } catch (error) {
+        console.error("Error fetching navigation data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching navigation data:", error);
     }
   };
 
@@ -124,8 +126,7 @@ export default function LandingScreen() {
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
-      console.log("No classes today");
-      return;
+      return "No classes today";
     }
 
     const nextClass = currentDayClasses.find((eachClass) => {
@@ -165,6 +166,12 @@ export default function LandingScreen() {
       <View style={styles.container}>
         <ActivityIndicator size="large" color="black" />
         <Text style={text_styles.titleText}>Loading your next class</Text>
+      </View>
+    );
+  } else if (nextClass == "No classes today") {
+    return (
+      <View style={styles.container}>
+        <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
       </View>
     );
   } else {
