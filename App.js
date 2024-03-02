@@ -7,6 +7,7 @@ import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TestForNotifications from "./TestingInstallations/TestForNotifications";
 
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
@@ -43,6 +44,7 @@ export default function App() {
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
   });
 
+  return <TestForNotifications />;
   if (!fontsLoaded) {
     return <View />;
   }
