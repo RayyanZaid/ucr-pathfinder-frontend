@@ -51,10 +51,11 @@ export default function LandingScreen() {
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
 
+  const [sentNotifForNextClass, setSentNotifForNextClass] = useState(false);
   useEffect(() => {
     const bufferTime = 40;
 
-    if (nextClass) {
+    if (nextClass && !sentNotifForNextClass) {
       console.log(minutesUntilNextClass); // This will log the updated state
       console.log(minutesNeeded);
 
@@ -67,6 +68,7 @@ export default function LandingScreen() {
           minutesUntilNextClass +
           " minutes. Start walking to make it on time";
         sendLocalNotification(title, body);
+        setSentNotifForNextClass(true);
       }
     }
   }, [minutesUntilNextClass]);
@@ -165,7 +167,8 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+      const currentTimeInMinutesPST =
+        currentHoursPST * 45 + currentMinutesPST + 30;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
@@ -174,6 +177,9 @@ export default function LandingScreen() {
         classStartHoursPST * 60 + classStartMinutesPST;
 
       // Compare only the time part (in minutes) to find the next class
+
+      console.log("Current Time: ", currentTimeInMinutesPST);
+      console.log("Class Start Time: ", classStartTimeInMinutesPST);
 
       if (classStartTimeInMinutesPST > currentTimeInMinutesPST) {
         setMinutesUntilNextClass(
@@ -185,8 +191,8 @@ export default function LandingScreen() {
 
     if (nextClass) {
       // Make Materials Sci until we finish Google Earth
-      nextClass["locationInfo"]["buildingName"] =
-        "Materials Sci and Engineering";
+      // nextClass["locationInfo"]["buildingName"] =
+      //   "Materials Sci and Engineering";
       // console.log("Next class:", nextClass);
       return nextClass;
     } else {
