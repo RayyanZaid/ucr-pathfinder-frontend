@@ -14,7 +14,7 @@ import api from "../api";
 import button_styles from "../styles/button_styles";
 import * as Location from "expo-location";
 import NavigationStage from "../components/MapComponents/NavigationStage";
-
+import { sendLocalNotification } from "../functions/sendNotification";
 const screenHeight = Dimensions.get("window").height;
 
 var ucrRegion = {
@@ -30,6 +30,8 @@ export default function LandingScreen() {
   const [nextClass, setNextClass] = useState(null);
 
   const [isInNavigation, setIsInNavigation] = useState(false);
+
+  const [minutesUntilNextClass, setMinutesUntilNextClass] = useState(null);
 
   const toggleNavigation = () => {
     setIsInNavigation(!isInNavigation);
@@ -48,6 +50,26 @@ export default function LandingScreen() {
   const [edges, setEdges] = useState(null);
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
+
+  useEffect(() => {
+    const bufferTime = 40;
+
+    if (nextClass) {
+      console.log(minutesUntilNextClass); // This will log the updated state
+      console.log(minutesNeeded);
+
+      if (minutesNeeded + bufferTime >= minutesUntilNextClass) {
+        const title = "DUDE";
+        const body =
+          "Your " +
+          nextClass["courseNumber"] +
+          " class starts in " +
+          minutesUntilNextClass +
+          " minutes. Start walking bruh";
+        sendLocalNotification(title, body);
+      }
+    }
+  }, [minutesUntilNextClass]);
 
   useEffect(() => {
     const fetchLocationAndGetNavigation = async () => {
@@ -87,8 +109,10 @@ export default function LandingScreen() {
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
+    // console.log("Getting Navigation Data");
+
     if (nextClassData != "No classes today") {
-      console.log("Getting Navigation data from backend");
+      // console.log("Getting Navigation data from backend");
       const uid = "rayyanzaid0401@gmail.com";
 
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
@@ -118,12 +142,12 @@ export default function LandingScreen() {
   const getNextClass = async () => {
     const now = new Date();
     // Adjust current time to PST for comparison
-
+    // console.log("Getting Next Class");
     let schedule = await getFromAsyncStorage("Schedule");
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = currentDayNumber - 1;
+    let scheduleCurrentDayIndex = 3;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
@@ -132,7 +156,7 @@ export default function LandingScreen() {
 
     const nextClass = currentDayClasses.find((eachClass) => {
       const classStartTimeString = eachClass["timeInfo"]["startTime"];
-      console.log(eachClass["courseNumber"]);
+      // console.log(eachClass["courseNumber"]);
       const classStartTimeDateObject = new Date(classStartTimeString);
 
       // Extract hours and minutes for current time in PST
@@ -145,8 +169,14 @@ export default function LandingScreen() {
       const classStartMinutesPST = classStartTimeDateObject.getMinutes();
       const classStartTimeInMinutesPST =
         classStartHoursPST * 60 + classStartMinutesPST;
-      console.log(classStartHoursPST);
+
       // Compare only the time part (in minutes) to find the next class
+
+      if (classStartTimeInMinutesPST > currentTimeInMinutesPST) {
+        setMinutesUntilNextClass(
+          classStartTimeInMinutesPST - currentTimeInMinutesPST
+        );
+      }
       return classStartTimeInMinutesPST > currentTimeInMinutesPST;
     });
 
@@ -154,10 +184,10 @@ export default function LandingScreen() {
       // Make Materials Sci until we finish Google Earth
       nextClass["locationInfo"]["buildingName"] =
         "Materials Sci and Engineering";
-      console.log("Next class:", nextClass);
+      // console.log("Next class:", nextClass);
       return nextClass;
     } else {
-      console.log("No more classes for today.");
+      // console.log("No more classes for today.");
       return null;
     }
   };
@@ -173,6 +203,10 @@ export default function LandingScreen() {
     return (
       <View style={styles.container}>
         <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
+        <Button
+          title="Push to send notif"
+          onPress={() => sendLocalNotification("title", "body")}
+        />
       </View>
     );
   } else {
