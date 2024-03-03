@@ -74,6 +74,10 @@ export default function LandingScreen() {
   }, [minutesUntilNextClass]);
 
   useEffect(() => {
+    setSentNotifForNextClass(false);
+  }, [nextClass]);
+
+  useEffect(() => {
     const fetchLocationAndGetNavigation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
