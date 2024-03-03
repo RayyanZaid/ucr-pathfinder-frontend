@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -9,57 +10,38 @@ import {
 import text_styles from "../styles/text_styles";
 import MapWithPath from "../components/MapComponents/PreviewStage";
 import EachCourse from "../components/CourseComponents/EachCourse";
-import { useEffect, useState } from "react";
 import api from "../api";
 import button_styles from "../styles/button_styles";
 import * as Location from "expo-location";
 import NavigationStage from "../components/MapComponents/NavigationStage";
 import { sendLocalNotification } from "../functions/sendNotification";
+
 const screenHeight = Dimensions.get("window").height;
 
-var ucrRegion = {
-  latitude: 33.9737,
-  longitude: -117.3281,
-  latitudeDelta: 0.009,
-  longitudeDelta: 0.009,
-};
-
 export default function LandingScreen() {
-  // State Variables
-
   const [nextClass, setNextClass] = useState(null);
-
   const [isInNavigation, setIsInNavigation] = useState(false);
-
   const [minutesUntilNextClass, setMinutesUntilNextClass] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [nodes, setNodes] = useState(null);
+  const [edges, setEdges] = useState(null);
+  const [minutesNeeded, setMinutesNeeded] = useState(null);
+  const [distance, setDistance] = useState(null);
+  const [notificationSent, setNotificationSent] = useState(false);
 
   const toggleNavigation = () => {
     setIsInNavigation(!isInNavigation);
   };
 
-  // Location State Variables
-
-  const [location, setLocation] = useState(null);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
-  const [altitude, setAltitude] = useState(null);
-
-  // Navigation State Variables
-
-  const [nodes, setNodes] = useState(null);
-  const [edges, setEdges] = useState(null);
-  const [minutesNeeded, setMinutesNeeded] = useState(null);
-  const [distance, setDistance] = useState(null);
-
-  const [sentNotifForNextClass, setSentNotifForNextClass] = useState(false);
   useEffect(() => {
-    const bufferTime = 40;
+    const fetchData = async () => {
+      const bufferTime = 40;
 
-    if (nextClass && !sentNotifForNextClass) {
-      console.log(minutesUntilNextClass); // This will log the updated state
-      console.log(minutesNeeded);
-
-      if (minutesNeeded + bufferTime >= minutesUntilNextClass) {
+      if (
+        nextClass &&
+        !notificationSent &&
+        minutesNeeded + bufferTime >= minutesUntilNextClass
+      ) {
         const title = "Head to " + nextClass["courseNumber"];
         const body =
           "Your " +
@@ -67,15 +49,23 @@ export default function LandingScreen() {
           " class starts in " +
           minutesUntilNextClass +
           " minutes. Start walking to make it on time";
-        sendLocalNotification(title, body);
-        setSentNotifForNextClass(true);
+
+        console.log("Sending notification...");
+        await sendLocalNotification(title, body);
+
+        setNotificationSent(true);
+        console.log("Notification sent.");
       }
-    }
-  }, [minutesUntilNextClass]);
+    };
+
+    fetchData();
+  }, [minutesUntilNextClass, notificationSent]);
 
   useEffect(() => {
-    setSentNotifForNextClass(false);
-  }, [nextClass]);
+    setNotificationSent(false);
+
+    console.log("nextClass changed to:", nextClass);
+  }, [JSON.stringify(nextClass)]);
 
   useEffect(() => {
     const fetchLocationAndGetNavigation = async () => {
@@ -87,14 +77,11 @@ export default function LandingScreen() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-      setLatitude(location.coords.latitude);
-      setLongitude(location.coords.longitude);
-      setAltitude(location.coords.altitude);
 
       try {
         const nextClassData = await getNextClass();
 
-        if (nextClassData != null) {
+        if (nextClassData) {
           setNextClass(nextClassData);
         } else {
           return;
@@ -108,28 +95,21 @@ export default function LandingScreen() {
       }
     };
 
-    // Fetches user location every 3 seconds
     const intervalId = setInterval(fetchLocationAndGetNavigation, 3000);
 
     return () => clearInterval(intervalId);
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
-    // console.log("Getting Navigation Data");
-
     if (
-      nextClassData != "No classes today" &&
-      nextClassData != "No more classes today"
+      nextClassData !== "No classes today" &&
+      nextClassData !== "No more classes today"
     ) {
-      // console.log("Getting Navigation data from backend");
-      const uid = "rayyanzaid0401@gmail.com";
-
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
         const response = await api.get("/getShortestPath", {
           params: {
-            uid,
             latitude: coords.latitude,
             longitude: coords.longitude,
             altitude: coords.altitude,
@@ -147,7 +127,6 @@ export default function LandingScreen() {
       }
     }
   };
-
   const getNextClass = async () => {
     const now = new Date();
     // Adjust current time to PST for comparison
@@ -172,7 +151,7 @@ export default function LandingScreen() {
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
       const currentTimeInMinutesPST =
-        currentHoursPST * 45 + currentMinutesPST + 30;
+        currentHoursPST * 60 + currentMinutesPST + 800;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
@@ -194,10 +173,6 @@ export default function LandingScreen() {
     });
 
     if (nextClass) {
-      // Make Materials Sci until we finish Google Earth
-      // nextClass["locationInfo"]["buildingName"] =
-      //   "Materials Sci and Engineering";
-      // console.log("Next class:", nextClass);
       return nextClass;
     } else {
       // console.log("No more classes for today.");
@@ -208,20 +183,17 @@ export default function LandingScreen() {
   if (!nextClass) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
-        <Text style={text_styles.titleText}>Loading your next class</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={text_styles.titleText}>Loading your next class...</Text>
       </View>
     );
-  } else if (nextClass == "No classes today") {
+  } else if (
+    nextClass === "No classes today" ||
+    nextClass === "No more classes today"
+  ) {
     return (
       <View style={styles.container}>
-        <Text style={text_styles.titleText}>No classes today!! :)</Text>
-      </View>
-    );
-  } else if (nextClass == "No more classes today") {
-    return (
-      <View style={styles.container}>
-        <Text style={text_styles.titleText}>No more classes today!! :)</Text>
+        <Text style={text_styles.titleText}>{nextClass}</Text>
       </View>
     );
   } else {
@@ -232,13 +204,13 @@ export default function LandingScreen() {
             <Text style={text_styles.titleText}>
               Path to your {nextClass["courseNumber"]} class
             </Text>
+            {/* {notificationSent ? <Text>Yay</Text> : <Text>No</Text>} */}
             <MapWithPath
               nodes={nodes}
               edges={edges}
               minutesNeeded={minutesNeeded}
               distance={distance}
             />
-
             <Button
               onPress={toggleNavigation}
               title="Start Navigation"
@@ -264,7 +236,6 @@ export default function LandingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     alignItems: "center",
     justifyContent: "center",
     marginVertical: screenHeight * 0.05,
