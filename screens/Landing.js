@@ -59,13 +59,13 @@ export default function LandingScreen() {
       console.log(minutesNeeded);
 
       if (minutesNeeded + bufferTime >= minutesUntilNextClass) {
-        const title = "DUDE";
+        const title = "Head to " + nextClass["courseNumber"];
         const body =
           "Your " +
           nextClass["courseNumber"] +
           " class starts in " +
           minutesUntilNextClass +
-          " minutes. Start walking bruh";
+          " minutes. Start walking to make it on time";
         sendLocalNotification(title, body);
       }
     }
@@ -111,7 +111,10 @@ export default function LandingScreen() {
   const getNavigationData = async (nextClassData, coords) => {
     // console.log("Getting Navigation Data");
 
-    if (nextClassData != "No classes today") {
+    if (
+      nextClassData != "No classes today" &&
+      nextClassData != "No more classes today"
+    ) {
       // console.log("Getting Navigation data from backend");
       const uid = "rayyanzaid0401@gmail.com";
 
@@ -188,7 +191,7 @@ export default function LandingScreen() {
       return nextClass;
     } else {
       // console.log("No more classes for today.");
-      return null;
+      return "No more classes today";
     }
   };
 
@@ -202,11 +205,13 @@ export default function LandingScreen() {
   } else if (nextClass == "No classes today") {
     return (
       <View style={styles.container}>
-        <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
-        <Button
-          title="Push to send notif"
-          onPress={() => sendLocalNotification("title", "body")}
-        />
+        <Text style={text_styles.titleText}>No classes today!! :)</Text>
+      </View>
+    );
+  } else if (nextClass == "No more classes today") {
+    return (
+      <View style={styles.container}>
+        <Text style={text_styles.titleText}>No more classes today!! :)</Text>
       </View>
     );
   } else {
