@@ -42,6 +42,9 @@ export default function LandingScreen() {
         !notificationSent &&
         minutesNeeded + bufferTime >= minutesUntilNextClass
       ) {
+        if (nextClass["courseNumber"] == null) {
+          return;
+        }
         const title = "Head to " + nextClass["courseNumber"];
         const body =
           "Your " +
@@ -95,10 +98,15 @@ export default function LandingScreen() {
       }
     };
 
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 3000);
+    // Call the function immediately to run once on component mount.
+    fetchLocationAndGetNavigation();
 
+    // Then set up the interval to repeat it.
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 10000); // Adjust the interval as needed.
+
+    // Cleanup on component unmount.
     return () => clearInterval(intervalId);
-  }, []);
+  }, []); // Empty dependency array means this effect runs only on mount and unmount.
 
   const getNavigationData = async (nextClassData, coords) => {
     if (
@@ -135,7 +143,7 @@ export default function LandingScreen() {
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = 3;
+    let scheduleCurrentDayIndex = 0;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
@@ -150,7 +158,7 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+      const currentTimeInMinutesPST = 16 * 60 + currentMinutesPST + 103;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
