@@ -104,7 +104,7 @@ export default function LandingScreen() {
     fetchLocationAndGetNavigation();
 
     // Then set up the interval to repeat it.
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 10000); // Adjust the interval as needed.
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 1000); // Adjust the interval as needed.
 
     // Cleanup on component unmount.
     return () => clearInterval(intervalId);
@@ -145,7 +145,7 @@ export default function LandingScreen() {
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = 0;
+    let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
@@ -160,8 +160,7 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST =
-        currentHoursPST * 60 + currentMinutesPST + 60 * 6;
+      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
@@ -171,8 +170,8 @@ export default function LandingScreen() {
       // console.log(classStartHoursPST);
       // Compare only the time part (in minutes) to find the next class
 
-      console.log("Current Time: ", currentTimeInMinutesPST);
-      console.log("Class Start Time: ", classStartTimeInMinutesPST);
+      // console.log("Current Time: ", currentTimeInMinutesPST);
+      // console.log("Class Start Time: ", classStartTimeInMinutesPST);
 
       if (classStartTimeInMinutesPST > currentTimeInMinutesPST) {
         setMinutesUntilNextClass(
