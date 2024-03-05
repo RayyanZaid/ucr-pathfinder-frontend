@@ -1,17 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default getFromAsyncStorage = async (key) => {
+async function getScheduleFromAsyncStorage() {
   try {
-    const jsonValue = await AsyncStorage.getItem(key);
+    const jsonValue = await AsyncStorage.getItem("Schedule");
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
     // error reading value
     console.log(e);
   }
-};
+}
 
-// // Call the function and handle the retrieved data
-// retrieveData().then((arrayOfDictionaries) => {
-//   console.log(arrayOfDictionaries);
-//   // Use your array of dictionaries here
-// });
+async function getUidFromAsyncStorage() {
+  try {
+    const jsonValue = await AsyncStorage.getItem("uid");
+    // console.log(jsonValue);
+    return jsonValue;
+  } catch (e) {
+    console.log(e);
+  }
+}
+export { getScheduleFromAsyncStorage, getUidFromAsyncStorage };

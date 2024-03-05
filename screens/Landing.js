@@ -16,7 +16,10 @@ import * as Location from "expo-location";
 import NavigationStage from "../components/MapComponents/NavigationStage";
 import { sendLocalNotification } from "../functions/sendNotification";
 import LogoutButton from "../components/AuthComponents/LogoutButton";
-import getFromAsyncStorage from "../functions/getFromAsyncStorage";
+import {
+  getScheduleFromAsyncStorage,
+  getUidFromAsyncStorage,
+} from "../functions/getFromAsyncStorage";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -141,7 +144,7 @@ export default function LandingScreen() {
     const now = new Date();
     // Adjust current time to PST for comparison
     // console.log("Getting Next Class");
-    let schedule = await getFromAsyncStorage("Schedule");
+    let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();

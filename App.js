@@ -23,7 +23,11 @@ function useAsyncStoragePolling(key, interval = 1000) {
     const fetchValue = async () => {
       const storedValue = await AsyncStorage.getItem(key);
       if (isMounted) {
-        setValue(storedValue ? JSON.parse(storedValue) : null);
+        if (key == "schedule") {
+          setValue(storedValue ? JSON.parse(storedValue) : null);
+        } else {
+          setValue(storedValue);
+        }
       }
     };
 
@@ -80,9 +84,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const schedule = useAsyncStoragePolling("Schedule");
-  const uid = "Vv5dp03BRhSwMqRcYPnoeaf1frA2";
-  console.log(uid);
-
+  const uid = useAsyncStoragePolling("uid");
   // console.log(uid);
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
@@ -94,13 +96,13 @@ export default function App() {
 
   if (!fontsLoaded) {
     return <View />;
-  } else if (uid == null) {
+  } else if (uid === null) {
     return (
       <View style={styles.container}>
         <SignIn />
       </View>
     );
-  } else if (schedule == null) {
+  } else if (schedule === null) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />

@@ -13,8 +13,9 @@ import UploadICS from "../components/UploadICS";
 import FullScheduleDisplay from "../components/CourseComponents/FullScheduleDisplay";
 import text_styles from "../styles/text_styles";
 import Icon from "react-native-vector-icons/FontAwesome";
-import getFromAsyncStorage from "../functions/getFromAsyncStorage";
+
 import removeFromAsyncStorage from "../functions/removeFromAsyncStorage";
+import { getScheduleFromAsyncStorage } from "../functions/getFromAsyncStorage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -31,7 +32,7 @@ export default function ScheduleScreen() {
     // Define the function inside useEffect to avoid defining it on every render
     const fetchSchedule = async () => {
       try {
-        const schedule = await getFromAsyncStorage("Schedule");
+        let schedule = await getScheduleFromAsyncStorage();
         if (schedule !== null) {
           // If there is a schedule, do something with it (e.g., set state to cause re-render)
           console.log("Schedule found and set");

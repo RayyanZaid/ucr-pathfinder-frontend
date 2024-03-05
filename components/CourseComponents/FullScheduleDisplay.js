@@ -11,7 +11,7 @@ import {
 import OneDayScheduleDisplay from "../CourseComponents/OneDayScheduleDisplay";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-import getFromAsyncStorage from "../../functions/getFromAsyncStorage";
+import { getScheduleFromAsyncStorage } from "../../functions/getFromAsyncStorage";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
@@ -22,7 +22,7 @@ export default function FullScheduleDisplay() {
 
   useEffect(() => {
     async function fetchSchedule() {
-      const schedule = await getFromAsyncStorage("Schedule");
+      let schedule = await getScheduleFromAsyncStorage();
       setScheduleDictionaryArray(schedule || []);
 
       const date = new Date();

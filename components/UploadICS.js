@@ -18,8 +18,10 @@ import Icon from "react-native-vector-icons/FontAwesome"; // Import the icon com
 import button_styles from "../styles/button_styles";
 import text_styles from "../styles/text_styles";
 
-import saveToAsyncStorage from "../functions/saveToAsyncStorage";
-import getFromAsyncStorage from "../functions/getFromAsyncStorage";
+import { saveScheduleToAsyncStorage } from "../functions/saveToAsyncStorage";
+import getScheduleFromAsyncStorage, {
+  getUidFromAsyncStorage,
+} from "../functions/getFromAsyncStorage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -57,7 +59,7 @@ export default function UploadICS({ onIsSavedChange }) {
           type: "*/*", // Adjust the file type as needed
         });
 
-        formData.append("uid", "Vv5dp03BRhSwMqRcYPnoeaf1frA2");
+        formData.append("uid", await getUidFromAsyncStorage());
 
         const response = await api.post("/upload", formData);
 
@@ -75,7 +77,7 @@ export default function UploadICS({ onIsSavedChange }) {
   async function getScheduleFromFirebase() {
     console.log("Getting Schedule From Firebase");
     try {
-      const uid = "Vv5dp03BRhSwMqRcYPnoeaf1frA2";
+      const uid = await getUidFromAsyncStorage();
       api
         .get("/displaySchedule", { params: { uid } })
         .then(async (response) => {
@@ -83,9 +85,8 @@ export default function UploadICS({ onIsSavedChange }) {
           console.log("Got schedule from backend");
 
           try {
-            await saveToAsyncStorage(
-              "Schedule",
-              JSON.stringify(response.data["scheduleDictionaryArray"])
+            await saveScheduleToAsyncStorage(
+              response.data["scheduleDictionaryArray"]
             );
             setIsSaved(true);
 

@@ -128,7 +128,7 @@ export default function SignIn() {
           // Assuming uidResponse.data contains the UID, you can now use it for further processing
           console.log("UID fetched successfully:", uidResponse.data);
           console.log(uidResponse.data["uid"]);
-          saveToAsyncStorage("uid", "Vv5dp03BRhSwMqRcYPnoeaf1frA2");
+          saveToAsyncStorage("uid", uidResponse.data["uid"]);
         }
       } catch (error) {
         console.error("Error fetching UID:", error);
