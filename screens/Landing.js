@@ -69,6 +69,7 @@ export default function LandingScreen() {
         if (nextClassData != null) {
           setNextClass(nextClassData);
         } else {
+          setNextClass("No more classes today");
           return;
         }
 
@@ -87,10 +88,9 @@ export default function LandingScreen() {
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
-    if (nextClassData != "No classes today") {
+    if (nextClass != "No classes today") {
       console.log("Getting Navigation data from backend");
       const uid = "rayyanzaid0401@gmail.com";
-
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
@@ -172,7 +172,13 @@ export default function LandingScreen() {
   } else if (nextClass == "No classes today") {
     return (
       <View style={styles.container}>
-        <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
+        <Text style={text_styles.titleText}>No classes Today!! :)</Text>
+      </View>
+    );
+  } else if (nextClass == "No more classes today") {
+    return (
+      <View style={styles.container}>
+        <Text style={text_styles.titleText}>No more classes Today!! :)</Text>
       </View>
     );
   } else {
