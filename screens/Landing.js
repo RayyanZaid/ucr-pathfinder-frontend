@@ -91,7 +91,7 @@ export default function LandingScreen() {
 
   const getNavigationData = async (nextClassData, coords) => {
     if (nextClassData != "No classes today") {
-      console.log("Getting Navigation data from backend");
+      // console.log("Getting Navigation data from backend");
       const uid = getFromAsyncStorage("uid");
 
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
@@ -141,7 +141,8 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+      const currentTimeInMinutesPST =
+        currentHoursPST * 60 + currentMinutesPST + 60 * 6;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
@@ -155,8 +156,8 @@ export default function LandingScreen() {
 
     if (nextClass) {
       // Make Materials Sci until we finish Google Earth
-      nextClass["locationInfo"]["buildingName"] =
-        "Materials Sci and Engineering";
+      // nextClass["locationInfo"]["buildingName"] =
+      //   "Materials Sci and Engineering";
       // console.log("Next class:", nextClass);
       return nextClass;
     } else {
