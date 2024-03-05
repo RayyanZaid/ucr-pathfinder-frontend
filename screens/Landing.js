@@ -152,8 +152,8 @@ export default function LandingScreen() {
 
     if (nextClass) {
       // Make Materials Sci until we finish Google Earth
-      nextClass["locationInfo"]["buildingName"] =
-        "Materials Sci and Engineering";
+      // nextClass["locationInfo"]["buildingName"] =
+      //   "Materials Sci and Engineering";
       console.log("Next class:", nextClass);
       return nextClass;
     } else {
@@ -172,13 +172,13 @@ export default function LandingScreen() {
   } else if (nextClass == "No classes today") {
     return (
       <View style={styles.container}>
-        <Text style={text_styles.titleText}>No classes Today!! :)</Text>
+        <Text style={text_styles.titleText}>No classes today!! :)</Text>
       </View>
     );
   } else if (nextClass == "No more classes today") {
     return (
       <View style={styles.container}>
-        <Text style={text_styles.titleText}>No more classes Today!! :)</Text>
+        <Text style={text_styles.titleText}>No more classes today!! :)</Text>
       </View>
     );
   } else {
