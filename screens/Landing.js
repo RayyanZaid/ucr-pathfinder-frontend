@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -10,47 +10,67 @@ import {
 import text_styles from "../styles/text_styles";
 import MapWithPath from "../components/MapComponents/PreviewStage";
 import EachCourse from "../components/CourseComponents/EachCourse";
-import { useEffect, useState } from "react";
 import api from "../api";
 import button_styles from "../styles/button_styles";
 import * as Location from "expo-location";
 import NavigationStage from "../components/MapComponents/NavigationStage";
+import { sendLocalNotification } from "../functions/sendNotification";
 import LogoutButton from "../components/AuthComponents/LogoutButton";
 import getFromAsyncStorage from "../functions/getFromAsyncStorage";
 
 const screenHeight = Dimensions.get("window").height;
 
-var ucrRegion = {
-  latitude: 33.9737,
-  longitude: -117.3281,
-  latitudeDelta: 0.009,
-  longitudeDelta: 0.009,
-};
-
 export default function LandingScreen() {
-  // State Variables
-
   const [nextClass, setNextClass] = useState(null);
-
   const [isInNavigation, setIsInNavigation] = useState(false);
+  const [minutesUntilNextClass, setMinutesUntilNextClass] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [nodes, setNodes] = useState(null);
+  const [edges, setEdges] = useState(null);
+  const [minutesNeeded, setMinutesNeeded] = useState(null);
+  const [distance, setDistance] = useState(null);
+  const [notificationSent, setNotificationSent] = useState(false);
 
   const toggleNavigation = () => {
     setIsInNavigation(!isInNavigation);
   };
 
-  // Location State Variables
+  useEffect(() => {
+    const fetchData = async () => {
+      const bufferTime = 40;
 
-  const [location, setLocation] = useState(null);
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
-  const [altitude, setAltitude] = useState(null);
+      if (
+        nextClass &&
+        !notificationSent &&
+        minutesNeeded + bufferTime >= minutesUntilNextClass
+      ) {
+        if (nextClass["courseNumber"] == null) {
+          return;
+        }
+        const title = "Head to " + nextClass["courseNumber"];
+        const body =
+          "Your " +
+          nextClass["courseNumber"] +
+          " class starts in " +
+          minutesUntilNextClass +
+          " minutes. Start walking to make it on time";
 
-  // Navigation State Variables
+        console.log("Sending notification...");
+        await sendLocalNotification(title, body);
 
-  const [nodes, setNodes] = useState(null);
-  const [edges, setEdges] = useState(null);
-  const [minutesNeeded, setMinutesNeeded] = useState(null);
-  const [distance, setDistance] = useState(null);
+        setNotificationSent(true);
+        console.log("Notification sent.");
+      }
+    };
+
+    fetchData();
+  }, [minutesUntilNextClass, notificationSent]);
+
+  useEffect(() => {
+    setNotificationSent(false);
+
+    console.log("nextClass changed to:", nextClass);
+  }, [JSON.stringify(nextClass)]);
 
   useEffect(() => {
     const fetchLocationAndGetNavigation = async () => {
@@ -62,14 +82,11 @@ export default function LandingScreen() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-      setLatitude(location.coords.latitude);
-      setLongitude(location.coords.longitude);
-      setAltitude(location.coords.altitude);
 
       try {
         const nextClassData = await getNextClass();
 
-        if (nextClassData != null) {
+        if (nextClassData) {
           setNextClass(nextClassData);
         } else {
           return;
@@ -83,23 +100,26 @@ export default function LandingScreen() {
       }
     };
 
-    // Fetches user location every 3 seconds
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 3000);
+    // Call the function immediately to run once on component mount.
+    fetchLocationAndGetNavigation();
 
+    // Then set up the interval to repeat it.
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 10000); // Adjust the interval as needed.
+
+    // Cleanup on component unmount.
     return () => clearInterval(intervalId);
-  }, []);
+  }, []); // Empty dependency array means this effect runs only on mount and unmount.
 
   const getNavigationData = async (nextClassData, coords) => {
-    if (nextClassData != "No classes today") {
-      // console.log("Getting Navigation data from backend");
-      const uid = getFromAsyncStorage("uid");
-
+    if (
+      nextClassData !== "No classes today" &&
+      nextClassData !== "No more classes today"
+    ) {
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
         const response = await api.get("/getShortestPath", {
           params: {
-            uid,
             latitude: coords.latitude,
             longitude: coords.longitude,
             altitude: coords.altitude,
@@ -117,16 +137,15 @@ export default function LandingScreen() {
       }
     }
   };
-
   const getNextClass = async () => {
     const now = new Date();
     // Adjust current time to PST for comparison
-
+    // console.log("Getting Next Class");
     let schedule = await getFromAsyncStorage("Schedule");
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = currentDayNumber - 1;
+    let scheduleCurrentDayIndex = 0;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
@@ -151,6 +170,15 @@ export default function LandingScreen() {
         classStartHoursPST * 60 + classStartMinutesPST;
       // console.log(classStartHoursPST);
       // Compare only the time part (in minutes) to find the next class
+
+      console.log("Current Time: ", currentTimeInMinutesPST);
+      console.log("Class Start Time: ", classStartTimeInMinutesPST);
+
+      if (classStartTimeInMinutesPST > currentTimeInMinutesPST) {
+        setMinutesUntilNextClass(
+          classStartTimeInMinutesPST - currentTimeInMinutesPST
+        );
+      }
       return classStartTimeInMinutesPST > currentTimeInMinutesPST;
     });
 
@@ -162,50 +190,61 @@ export default function LandingScreen() {
       return nextClass;
     } else {
       // console.log("No more classes for today.");
-      return null;
+      return "No more classes today";
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <LogoutButton />
-      {!nextClass ? (
-        <View>
-          <ActivityIndicator size="large" color="black" />
-          <Text style={text_styles.titleText}>Loading your next class</Text>
-        </View>
-      ) : nextClass == "No classes today" ? (
-        <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
-      ) : !isInNavigation ? (
-        <>
-          <Text style={text_styles.titleText}>
-            Path to your {nextClass["courseNumber"]} class
-          </Text>
-          <MapWithPath
-            nodes={nodes}
-            edges={edges}
-            minutesNeeded={minutesNeeded}
-            distance={distance}
-          />
-          <Button
-            onPress={toggleNavigation}
-            title="Start Navigation"
-            style={button_styles.mediumButton}
-          />
-          <EachCourse courseData={nextClass} />
-        </>
-      ) : (
-        <>
-          <NavigationStage />
-          <Button
-            onPress={toggleNavigation}
-            title="Cancel Navigation"
-            style={button_styles.mediumButton}
-          />
-        </>
-      )}
-    </View>
-  );
+  if (!nextClass) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={text_styles.titleText}>Loading your next class...</Text>
+      </View>
+    );
+  } else if (
+    nextClass === "No classes today" ||
+    nextClass === "No more classes today"
+  ) {
+    return (
+      <View style={styles.container}>
+        <Text style={text_styles.titleText}>{nextClass}</Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        {!isInNavigation ? (
+          <>
+            <Text style={text_styles.titleText}>
+              Path to your {nextClass["courseNumber"]} class
+            </Text>
+            {/* {notificationSent ? <Text>Yay</Text> : <Text>No</Text>} */}
+            <MapWithPath
+              nodes={nodes}
+              edges={edges}
+              minutesNeeded={minutesNeeded}
+              distance={distance}
+            />
+            <Button
+              onPress={toggleNavigation}
+              title="Start Navigation"
+              style={button_styles.mediumButton}
+            />
+            <EachCourse courseData={nextClass} />
+          </>
+        ) : (
+          <>
+            <NavigationStage />
+            <Button
+              onPress={toggleNavigation}
+              title="Cancel Navigation"
+              style={button_styles.mediumButton}
+            />
+          </>
+        )}
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
