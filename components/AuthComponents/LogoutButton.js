@@ -7,6 +7,7 @@ const LogoutButton = () => {
     // Define your logout logic here
     console.log("Logout button pressed");
     removeFromAsyncStorage("uid");
+    removeFromAsyncStorage("Schedule");
   };
 
   return (
