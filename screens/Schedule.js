@@ -15,8 +15,12 @@ import text_styles from "../styles/text_styles";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 import removeFromAsyncStorage from "../functions/removeFromAsyncStorage";
-import { getScheduleFromAsyncStorage } from "../functions/getFromAsyncStorage";
-
+import {
+  getScheduleFromAsyncStorage,
+  getUidFromAsyncStorage,
+} from "../functions/getFromAsyncStorage";
+import api from "../api";
+import { saveScheduleToAsyncStorage } from "../functions/saveToAsyncStorage";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
@@ -39,6 +43,29 @@ export default function ScheduleScreen() {
           setIsSaved(true);
         } else {
           console.log("No schedule found");
+          console.log("Get from firebase if it exists");
+          try {
+            const uid = await getUidFromAsyncStorage();
+            await api
+              .get("/displaySchedule", { params: { uid } })
+              .then(async (response) => {
+                // console.log(response.data["scheduleDictionaryArray"]);
+                console.log("Got schedule from backend");
+
+                try {
+                  await saveScheduleToAsyncStorage(
+                    response.data["scheduleDictionaryArray"]
+                  );
+                  setIsSaved(true);
+
+                  console.log("Saved schedule to Async Storage");
+                } catch (error) {
+                  console.log("Error while saving to Async:", error);
+                }
+              });
+          } catch (error) {
+            console.log("Error in overall function:", error);
+          }
         }
       } catch (error) {
         console.error("Error fetching schedule:", error);
@@ -46,7 +73,7 @@ export default function ScheduleScreen() {
     };
 
     fetchSchedule();
-  }, [isSaved]); // Depend on isSaved to re-run this effect
+  }, []); // Depend on isSaved to re-run this effect
 
   function handleIsSavedChange(isSaveFromChild) {
     console.log("isSaved state in parent component:", isSaveFromChild);
@@ -55,10 +82,15 @@ export default function ScheduleScreen() {
 
   // Async function to handle the trash icon press
   const handleDeleteSchedulePress = async () => {
-    console.log("Button");
-
+    console.log("Delete Schedule Button");
+    const uid = await getUidFromAsyncStorage();
     try {
       await removeFromAsyncStorage("Schedule");
+      await api
+        .get("/removeSchedule", { params: { uid } })
+        .then(async (response) => {
+          console.log("Removed schedule from firebase");
+        });
     } catch (error) {
       console.log(error);
     }
