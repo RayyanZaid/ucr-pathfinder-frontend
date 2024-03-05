@@ -57,7 +57,7 @@ export default function UploadICS({ onIsSavedChange }) {
           type: "*/*", // Adjust the file type as needed
         });
 
-        formData.append("uid", getFromAsyncStorage("uid"));
+        formData.append("uid", "Vv5dp03BRhSwMqRcYPnoeaf1frA2");
 
         const response = await api.post("/upload", formData);
 
@@ -75,7 +75,7 @@ export default function UploadICS({ onIsSavedChange }) {
   async function getScheduleFromFirebase() {
     console.log("Getting Schedule From Firebase");
     try {
-      const uid = getFromAsyncStorage("uid");
+      const uid = "Vv5dp03BRhSwMqRcYPnoeaf1frA2";
       api
         .get("/displaySchedule", { params: { uid } })
         .then(async (response) => {

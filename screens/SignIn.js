@@ -91,23 +91,6 @@ export default function SignIn() {
         "Timeout occurred, setting message to Firebase: Error (auth/too-many-requests)."
       );
 
-      try {
-        const uidResponse = await api.get("/getUID", {
-          params: { phoneNumber }, // Ensure your backend expects this query parameter
-        });
-
-        // Check if the response is successful and contains the data
-        if (uidResponse && uidResponse.data) {
-          // Assuming uidResponse.data contains the UID, you can now use it for further processing
-          console.log("UID fetched successfully:", uidResponse.data);
-          console.log(uidResponse.data["uid"]);
-          saveToAsyncStorage("uid", JSON.stringify(uidResponse.data["uid"]));
-        }
-      } catch (error) {
-        console.error("Error fetching UID:", error);
-        setStatusMessage("Failed to fetch UID");
-      }
-
       return;
     }
 
@@ -116,24 +99,6 @@ export default function SignIn() {
       setVerificationId(result.verificationId);
       setStatusMessage(null);
       setIsClickedSendVerificationCodeButton(true);
-    } else if (result.message === "Firebase: Error (auth/too-many-requests).") {
-      console.log(
-        "Automatically logging in the user cuz we're broke and can't afford too many requests"
-      );
-      try {
-        const uidResponse = await api.get("/getUID", {
-          params: { phoneNumber },
-        });
-
-        if (uidResponse && uidResponse.data) {
-          console.log("UID fetched successfully:", uidResponse.data);
-          console.log(uidResponse.data["uid"]);
-          saveToAsyncStorage("uid", JSON.stringify(uidResponse.data["uid"]));
-        }
-      } catch (error) {
-        console.error("Error fetching UID:", error);
-        setStatusMessage("Failed to fetch UID");
-      }
     } else {
       setStatusMessage(result.message);
       console.log(result.message);
@@ -163,7 +128,7 @@ export default function SignIn() {
           // Assuming uidResponse.data contains the UID, you can now use it for further processing
           console.log("UID fetched successfully:", uidResponse.data);
           console.log(uidResponse.data["uid"]);
-          saveToAsyncStorage("uid", JSON.stringify(uidResponse.data["uid"]));
+          saveToAsyncStorage("uid", "Vv5dp03BRhSwMqRcYPnoeaf1frA2");
         }
       } catch (error) {
         console.error("Error fetching UID:", error);

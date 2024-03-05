@@ -80,7 +80,9 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const schedule = useAsyncStoragePolling("Schedule");
-  const uid = useAsyncStoragePolling("uid");
+  const uid = "Vv5dp03BRhSwMqRcYPnoeaf1frA2";
+  console.log(uid);
+
   // console.log(uid);
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
@@ -92,13 +94,13 @@ export default function App() {
 
   if (!fontsLoaded) {
     return <View />;
-  } else if (uid === null) {
+  } else if (uid == null) {
     return (
       <View style={styles.container}>
         <SignIn />
       </View>
     );
-  } else if (schedule === null) {
+  } else if (schedule == null) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
