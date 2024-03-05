@@ -207,6 +207,7 @@ export default function LandingScreen() {
     return (
       <View style={styles.container}>
         <Text style={text_styles.titleText}>{nextClass}</Text>
+        <LogoutButton /> {/* Logout Button */}
       </View>
     );
   } else {
@@ -241,6 +242,7 @@ export default function LandingScreen() {
             />
           </>
         )}
+        <LogoutButton />
       </View>
     );
   }
