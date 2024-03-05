@@ -7,6 +7,9 @@ import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SignIn from "./screens/SignIn";
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs(); // Ignore all log notifications
 
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
@@ -38,33 +41,38 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const schedule = useAsyncStoragePolling("Schedule");
-
+  const uid = useAsyncStoragePolling("uid");
+  // console.log(uid);
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
   });
 
   if (!fontsLoaded) {
     return <View />;
-  }
-
-  if (schedule === null) {
+  } else if (uid === null) {
+    return (
+      <View style={styles.container}>
+        <SignIn />
+      </View>
+    );
+  } else if (schedule === null) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
         <StatusBar style="auto" />
       </View>
     );
+  } else {
+    return (
+      <NavigationContainer>
+        <Tab.Navigator screenOptions={{ headerShown: false }}>
+          <Tab.Screen name="Landing" component={LandingScreen} />
+          <Tab.Screen name="Schedule" component={ScheduleScreen} />
+        </Tab.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    );
   }
-
-  return (
-    <NavigationContainer>
-      <Tab.Navigator screenOptions={{ headerShown: false }}>
-        <Tab.Screen name="Landing" component={LandingScreen} />
-        <Tab.Screen name="Schedule" component={ScheduleScreen} />
-      </Tab.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
-  );
 }
 
 const styles = StyleSheet.create({

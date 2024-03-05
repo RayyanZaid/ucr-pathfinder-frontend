@@ -19,6 +19,7 @@ import button_styles from "../styles/button_styles";
 import text_styles from "../styles/text_styles";
 
 import saveToAsyncStorage from "../functions/saveToAsyncStorage";
+import getFromAsyncStorage from "../functions/getFromAsyncStorage";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -56,7 +57,7 @@ export default function UploadICS({ onIsSavedChange }) {
           type: "*/*", // Adjust the file type as needed
         });
 
-        formData.append("uid", "temporary");
+        formData.append("uid", getFromAsyncStorage("uid"));
 
         const response = await api.post("/upload", formData);
 
@@ -74,7 +75,7 @@ export default function UploadICS({ onIsSavedChange }) {
   async function getScheduleFromFirebase() {
     console.log("Getting Schedule From Firebase");
     try {
-      const uid = "rayyanzaid0401@gmail.com";
+      const uid = getFromAsyncStorage("uid");
       api
         .get("/displaySchedule", { params: { uid } })
         .then(async (response) => {

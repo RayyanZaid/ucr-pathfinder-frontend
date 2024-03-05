@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ActivityIndicator,
   Button,
@@ -14,6 +15,8 @@ import api from "../api";
 import button_styles from "../styles/button_styles";
 import * as Location from "expo-location";
 import NavigationStage from "../components/MapComponents/NavigationStage";
+import LogoutButton from "../components/AuthComponents/LogoutButton";
+import getFromAsyncStorage from "../functions/getFromAsyncStorage";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -69,7 +72,6 @@ export default function LandingScreen() {
         if (nextClassData != null) {
           setNextClass(nextClassData);
         } else {
-          setNextClass("No more classes today");
           return;
         }
 
@@ -88,9 +90,10 @@ export default function LandingScreen() {
   }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
-    if (nextClass != "No classes today") {
+    if (nextClassData != "No classes today") {
       console.log("Getting Navigation data from backend");
-      const uid = "rayyanzaid0401@gmail.com";
+      const uid = getFromAsyncStorage("uid");
+
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
@@ -132,7 +135,7 @@ export default function LandingScreen() {
 
     const nextClass = currentDayClasses.find((eachClass) => {
       const classStartTimeString = eachClass["timeInfo"]["startTime"];
-      console.log(eachClass["courseNumber"]);
+      // console.log(eachClass["courseNumber"]);
       const classStartTimeDateObject = new Date(classStartTimeString);
 
       // Extract hours and minutes for current time in PST
@@ -145,85 +148,71 @@ export default function LandingScreen() {
       const classStartMinutesPST = classStartTimeDateObject.getMinutes();
       const classStartTimeInMinutesPST =
         classStartHoursPST * 60 + classStartMinutesPST;
-      console.log(classStartHoursPST);
+      // console.log(classStartHoursPST);
       // Compare only the time part (in minutes) to find the next class
       return classStartTimeInMinutesPST > currentTimeInMinutesPST;
     });
 
     if (nextClass) {
       // Make Materials Sci until we finish Google Earth
-      // nextClass["locationInfo"]["buildingName"] =
-      //   "Materials Sci and Engineering";
-      console.log("Next class:", nextClass);
+      nextClass["locationInfo"]["buildingName"] =
+        "Materials Sci and Engineering";
+      // console.log("Next class:", nextClass);
       return nextClass;
     } else {
-      console.log("No more classes for today.");
+      // console.log("No more classes for today.");
       return null;
     }
   };
 
-  if (!nextClass) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
-        <Text style={text_styles.titleText}>Loading your next class</Text>
-      </View>
-    );
-  } else if (nextClass == "No classes today") {
-    return (
-      <View style={styles.container}>
-        <Text style={text_styles.titleText}>No classes today!! :)</Text>
-      </View>
-    );
-  } else if (nextClass == "No more classes today") {
-    return (
-      <View style={styles.container}>
-        <Text style={text_styles.titleText}>No more classes today!! :)</Text>
-      </View>
-    );
-  } else {
-    return (
-      <View style={styles.container}>
-        {!isInNavigation ? (
-          <>
-            <Text style={text_styles.titleText}>
-              Path to your {nextClass["courseNumber"]} class
-            </Text>
-            <MapWithPath
-              nodes={nodes}
-              edges={edges}
-              minutesNeeded={minutesNeeded}
-              distance={distance}
-            />
-
-            <Button
-              onPress={toggleNavigation}
-              title="Start Navigation"
-              style={button_styles.mediumButton}
-            />
-            <EachCourse courseData={nextClass} />
-          </>
-        ) : (
-          <>
-            <NavigationStage />
-            <Button
-              onPress={toggleNavigation}
-              title="Cancel Navigation"
-              style={button_styles.mediumButton}
-            />
-          </>
-        )}
-      </View>
-    );
-  }
+  return (
+    <View style={styles.container}>
+      <LogoutButton />
+      {!nextClass ? (
+        <View>
+          <ActivityIndicator size="large" color="black" />
+          <Text style={text_styles.titleText}>Loading your next class</Text>
+        </View>
+      ) : nextClass == "No classes today" ? (
+        <Text style={text_styles.titleText}>No Classes Today!! :)</Text>
+      ) : !isInNavigation ? (
+        <>
+          <Text style={text_styles.titleText}>
+            Path to your {nextClass["courseNumber"]} class
+          </Text>
+          <MapWithPath
+            nodes={nodes}
+            edges={edges}
+            minutesNeeded={minutesNeeded}
+            distance={distance}
+          />
+          <Button
+            onPress={toggleNavigation}
+            title="Start Navigation"
+            style={button_styles.mediumButton}
+          />
+          <EachCourse courseData={nextClass} />
+        </>
+      ) : (
+        <>
+          <NavigationStage />
+          <Button
+            onPress={toggleNavigation}
+            title="Cancel Navigation"
+            style={button_styles.mediumButton}
+          />
+        </>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     alignItems: "center",
     justifyContent: "center",
     marginVertical: screenHeight * 0.05,
+    paddingTop: screenHeight * 0.1,
   },
 });
