@@ -7,6 +7,12 @@ import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SignIn from "./screens/SignIn";
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs(); // Ignore all log notifications
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
+import TestForNotifications from "./TestingInstallations/TestForNotifications";
 
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
@@ -34,37 +40,82 @@ function useAsyncStoragePolling(key, interval = 1000) {
   return value;
 }
 
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Constants.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+    token = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+      })
+    ).data;
+    console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
+}
+
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   const schedule = useAsyncStoragePolling("Schedule");
-
+  const uid = useAsyncStoragePolling("uid");
+  // console.log(uid);
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
   });
 
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
   if (!fontsLoaded) {
     return <View />;
-  }
-
-  if (schedule === null) {
+  } else if (uid === null) {
+    return (
+      <View style={styles.container}>
+        <SignIn />
+      </View>
+    );
+  } else if (schedule === null) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
         <StatusBar style="auto" />
       </View>
     );
+  } else {
+    return (
+      <NavigationContainer>
+        <Tab.Navigator screenOptions={{ headerShown: false }}>
+          <Tab.Screen name="Landing" component={LandingScreen} />
+          <Tab.Screen name="Schedule" component={ScheduleScreen} />
+        </Tab.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    );
   }
-
-  return (
-    <NavigationContainer>
-      <Tab.Navigator screenOptions={{ headerShown: false }}>
-        <Tab.Screen name="Landing" component={LandingScreen} />
-        <Tab.Screen name="Schedule" component={ScheduleScreen} />
-      </Tab.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
-  );
 }
 
 const styles = StyleSheet.create({
