@@ -136,7 +136,7 @@ export default function App() {
         <SignIn />
       </View>
     );
-  } else if (!schedule || !localSchedule) {
+  } else if (!schedule && !localSchedule) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
