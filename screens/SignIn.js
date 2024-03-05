@@ -28,7 +28,7 @@ import { firebaseConfig } from "../firebaseConfig";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 
 import api from "../api";
-import saveToAsyncStorage from "../functions/saveToAsyncStorage";
+import { saveUidToAsyncStorage } from "../functions/saveToAsyncStorage";
 export default function SignIn() {
   // State Variables
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -128,7 +128,7 @@ export default function SignIn() {
           // Assuming uidResponse.data contains the UID, you can now use it for further processing
           console.log("UID fetched successfully:", uidResponse.data);
           console.log(uidResponse.data["uid"]);
-          saveToAsyncStorage("uid", uidResponse.data["uid"]);
+          saveUidToAsyncStorage(uidResponse.data["uid"]);
         }
       } catch (error) {
         console.error("Error fetching UID:", error);

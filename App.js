@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
+import SignIn from "./screens/SignIn";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SignIn from "./screens/SignIn";
 import { LogBox } from "react-native";
-LogBox.ignoreAllLogs(); // Ignore all log notifications
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import TestForNotifications from "./TestingInstallations/TestForNotifications";
+import api from "./api";
+import { getScheduleFromAsyncStorage } from "./functions/getFromAsyncStorage";
+
+LogBox.ignoreAllLogs(); // Ignore all log notifications
 
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
@@ -23,7 +25,7 @@ function useAsyncStoragePolling(key, interval = 1000) {
     const fetchValue = async () => {
       const storedValue = await AsyncStorage.getItem(key);
       if (isMounted) {
-        if (key == "schedule") {
+        if (key === "schedule") {
           setValue(storedValue ? JSON.parse(storedValue) : null);
         } else {
           setValue(storedValue);
@@ -80,29 +82,62 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
+async function getUidFromAsyncStorage() {
+  return await AsyncStorage.getItem("uid");
+}
+
+async function saveScheduleToAsyncStorage(schedule) {
+  await AsyncStorage.setItem("schedule", JSON.stringify(schedule));
+}
+
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const schedule = useAsyncStoragePolling("Schedule");
-  const uid = useAsyncStoragePolling("uid");
-  // console.log(uid);
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
   });
+
+  const uid = useAsyncStoragePolling("uid");
+  const localSchedule = useAsyncStoragePolling("Schedule");
+  const [schedule, setSchedule] = useState(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const uid = await getUidFromAsyncStorage();
+        if (uid) {
+          const response = await api.get("/displaySchedule", {
+            params: { uid },
+          });
+          const scheduleData = response.data["scheduleDictionaryArray"];
+          if (scheduleData != null) {
+            setSchedule(scheduleData);
+            await saveScheduleToAsyncStorage(scheduleData);
+          }
+
+          console.log("Got and saved schedule from backend");
+        }
+      } catch (error) {
+        console.log("Error fetching or saving schedule:", error);
+      }
+    };
+
+    fetchData();
+  }, [uid]);
+
   if (!fontsLoaded) {
     return <View />;
-  } else if (uid === null) {
+  } else if (!uid) {
     return (
       <View style={styles.container}>
         <SignIn />
       </View>
     );
-  } else if (schedule === null) {
+  } else if (!schedule || !localSchedule) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
