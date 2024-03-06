@@ -29,6 +29,9 @@ import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 
 import api from "../api";
 import { saveUidToAsyncStorage } from "../functions/saveToAsyncStorage";
+
+const skipAuth = true;
+
 export default function SignIn() {
   // State Variables
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -48,6 +51,11 @@ export default function SignIn() {
     setVerificationCode(code);
   };
   const onClickSendVerificationCode = async () => {
+    // using William's UID : TbpyIr6hrGWgK96zUCZYvVdMkjr1
+    if (skipAuth) {
+      saveUidToAsyncStorage("TbpyIr6hrGWgK96zUCZYvVdMkjr1");
+      return;
+    }
     console.log(
       "This function is responsible for sending the verification code."
     );
