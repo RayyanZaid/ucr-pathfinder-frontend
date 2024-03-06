@@ -37,11 +37,7 @@ export default function LandingScreen() {
     const fetchData = async () => {
       const bufferTime = 40;
 
-      if (
-        nextClass &&
-        !notificationSent &&
-        minutesNeeded + bufferTime >= minutesUntilNextClass
-      ) {
+      if (nextClass && minutesNeeded + bufferTime >= minutesUntilNextClass) {
         if (nextClass["courseNumber"] == null) {
           return;
         }
@@ -143,7 +139,7 @@ export default function LandingScreen() {
 
     // Assuming the day index is correct
     let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = currentDayNumber - 1;
+    let scheduleCurrentDayIndex = currentDayNumber;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
     if (currentDayClasses.length === 0) {
@@ -158,7 +154,8 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = 16 * 60 + currentMinutesPST + 120;
+      const currentTimeInMinutesPST =
+        currentHoursPST * 60 + currentMinutesPST - 50;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
