@@ -27,74 +27,49 @@ const screenHeight = Dimensions.get("window").height;
 export default function ScheduleScreen() {
   const [isSaved, setIsSaved] = useState(false);
 
-  // In ScheduleScreen
-  function handleIsSavedChange(isSaveFromChild) {
-    setIsSaved(isSaveFromChild); // This should trigger useEffect if isSaved is a dependency
-  }
-
   useEffect(() => {
-    // Define the function inside useEffect to avoid defining it on every render
-    const fetchSchedule = async () => {
+    const fetchAndSaveSchedule = async () => {
       try {
-        let schedule = await getScheduleFromAsyncStorage();
-        if (schedule !== null) {
-          // If there is a schedule, do something with it (e.g., set state to cause re-render)
-          console.log("Schedule found and set");
-          setIsSaved(true);
-        } else {
-          console.log("No schedule found");
-          console.log("Get from firebase if it exists");
-          try {
-            const uid = await getUidFromAsyncStorage();
-            await api
-              .get("/displaySchedule", { params: { uid } })
-              .then(async (response) => {
-                // console.log(response.data["scheduleDictionaryArray"]);
-                console.log("Got schedule from backend");
+        // Fetch schedule from API
+        const uid = await getUidFromAsyncStorage();
+        const response = await api.get("/displaySchedule", { params: { uid } });
+        const schedule = response.data["scheduleDictionaryArray"];
 
-                try {
-                  await saveScheduleToAsyncStorage(
-                    response.data["scheduleDictionaryArray"]
-                  );
-                  setIsSaved(true);
-
-                  console.log("Saved schedule to Async Storage");
-                } catch (error) {
-                  console.log("Error while saving to Async:", error);
-                }
-              });
-          } catch (error) {
-            console.log("Error in overall function:", error);
-          }
-        }
+        // Save schedule to async storage
+        await saveScheduleToAsyncStorage(schedule);
+        setIsSaved(true);
       } catch (error) {
-        console.error("Error fetching schedule:", error);
+        console.log("Error fetching and saving schedule:", error);
       }
     };
 
-    fetchSchedule();
-  }, []); // Depend on isSaved to re-run this effect
+    // Check if schedule exists in async storage
+    const checkScheduleExists = async () => {
+      try {
+        const schedule = await getScheduleFromAsyncStorage();
+        if (schedule !== null) {
+          setIsSaved(true);
+        }
+      } catch (error) {
+        console.error("Error fetching schedule from async storage:", error);
+      }
+    };
 
-  function handleIsSavedChange(isSaveFromChild) {
-    console.log("isSaved state in parent component:", isSaveFromChild);
-    setIsSaved(isSaveFromChild);
-  }
+    checkScheduleExists(); // Check if schedule exists in async storage
+    fetchAndSaveSchedule(); // Fetch schedule from API and save to async storage
+  }, []);
 
-  // Async function to handle the trash icon press
   const handleDeleteSchedulePress = async () => {
     console.log("Delete Schedule Button");
     const uid = await getUidFromAsyncStorage();
     try {
       await removeFromAsyncStorage("Schedule");
-      await api
-        .get("/removeSchedule", { params: { uid } })
-        .then(async (response) => {
-          console.log("Removed schedule from firebase");
-        });
+      await api.get("/removeSchedule", { params: { uid } });
+      console.log("Removed schedule from firebase");
+      setIsSaved(false);
     } catch (error) {
-      console.log(error);
+      console.log("Error deleting schedule:", error);
     }
-    setIsSaved(false);
   };
 
   return (
@@ -122,7 +97,7 @@ export default function ScheduleScreen() {
           >
             Your UCR Class Schedule
           </Text>
-          <UploadICS onIsSavedChange={handleIsSavedChange} />
+          <UploadICS onIsSavedChange={setIsSaved} />
         </View>
       )}
       <StatusBar style="auto" />
