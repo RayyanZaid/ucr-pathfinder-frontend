@@ -13,23 +13,23 @@ import TestForNotifications from "./TestingInstallations/TestForNotifications";
 import { getUidFromAsyncStorage } from "./functions/getFromAsyncStorage";
 import SignIn from "./screens/SignIn";
 
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs(); // Ignore all log notifications
 // Custom hook for polling AsyncStorage
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
 
   useEffect(() => {
-    let isMounted = true; // Track mounted status
+    let isMounted = true;
 
     const fetchValue = async () => {
-      try {
-        const storedValue = await AsyncStorage.getItem(key);
-        if (isMounted) {
-          // console.log(storedValue);
+      const storedValue = await AsyncStorage.getItem(key);
+      if (isMounted) {
+        if (key === "schedule") {
           setValue(storedValue ? JSON.parse(storedValue) : null);
+        } else {
+          setValue(storedValue);
         }
-      } catch (error) {
-        console.error("Failed to fetch from AsyncStorage:", error);
-        // Optionally, handle errors like showing a message to the user
       }
     };
 
@@ -38,7 +38,7 @@ function useAsyncStoragePolling(key, interval = 1000) {
     const id = setInterval(fetchValue, interval); // Start polling
 
     return () => {
-      isMounted = false; // Set as unmounted
+      isMounted = false;
       clearInterval(id); // Cleanup
     };
   }, [key, interval]);
