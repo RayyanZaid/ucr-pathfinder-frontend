@@ -21,6 +21,8 @@ import {
   getUidFromAsyncStorage,
 } from "../functions/getFromAsyncStorage";
 
+import { getShortestPath } from "../functions/getShortestPath";
+
 const screenHeight = Dimensions.get("window").height;
 
 export default function LandingScreen() {
@@ -121,19 +123,13 @@ export default function LandingScreen() {
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
-        const response = await api.get("/getShortestPath", {
-          params: {
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            altitude: coords.altitude,
-            classBuildingName,
-          },
-        });
+        const response = await getShortestPath(coords, classBuildingName);
+
         if (response) {
-          setNodes(response.data["nodes"]);
-          setEdges(response.data["edges"]);
-          setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-          setDistance(Math.ceil(response.data["totalLength"]));
+          setNodes(response["nodes"]);
+          setEdges(response["edges"]);
+          setMinutesNeeded(response["minutesNeeded"]);
+          setDistance(response["distance"]);
         }
       } catch (error) {
         console.error("Error fetching navigation data:", error);
