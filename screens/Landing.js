@@ -24,6 +24,7 @@ import {
 import { getShortestPath } from "../functions/getShortestPath";
 
 const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 export default function LandingScreen() {
   const [nextClass, setNextClass] = useState(null);
@@ -218,12 +219,16 @@ export default function LandingScreen() {
               Path to your {nextClass["courseNumber"]} class
             </Text>
             {/* {notificationSent ? <Text>Yay</Text> : <Text>No</Text>} */}
-            <MapWithPath
-              nodes={nodes}
-              edges={edges}
-              minutesNeeded={minutesNeeded}
-              distance={distance}
-            />
+
+            <View style={styles.mapContainer}>
+              <MapWithPath
+                nodes={nodes}
+                edges={edges}
+                minutesNeeded={minutesNeeded}
+                distance={distance}
+              />
+            </View>
+
             <Button
               onPress={toggleNavigation}
               title="Start Navigation"
@@ -254,5 +259,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: screenHeight * 0.05,
     paddingTop: screenHeight * 0.1,
+  },
+  mapContainer: {
+    height: screenHeight * 0.4,
+    width: screenWidth * 1,
   },
 });

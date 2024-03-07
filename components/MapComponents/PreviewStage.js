@@ -72,12 +72,14 @@ const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: "50%",
-    width: "100%",
+    height: "100%",
+    width: "100%%",
     justifyContent: "center",
     alignItems: "center",
-    margin: screenHeight * 0.01,
     position: "relative",
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: "#000",
   },
   map: {
     ...StyleSheet.absoluteFillObject,

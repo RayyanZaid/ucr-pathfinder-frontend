@@ -1,11 +1,34 @@
-import { View, Text, StyleSheet, Dimensions, Button } from "react-native";
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Animated,
+  TouchableWithoutFeedback,
+} from "react-native";
 import text_styles from "../../styles/text_styles";
 
+import { getShortestPath } from "../../functions/getShortestPath";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
+import * as Location from "expo-location";
+import MapWithPath from "../MapComponents/PreviewStage";
 
 export default function EachCourse({ courseData }) {
+  const [location, setLocation] = useState(null);
+
+  const [nodes, setNodes] = useState(null);
+  const [edges, setEdges] = useState(null);
+  const [minutesNeeded, setMinutesNeeded] = useState(null);
+  const [distance, setDistance] = useState(null);
+
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const toggleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
+
   function getCourseNumber() {
     const courseNumber = courseData["courseNumber"];
 
@@ -76,20 +99,81 @@ export default function EachCourse({ courseData }) {
     return { name: teacherName, fontSize: fontSize };
   }
 
+  useEffect(() => {
+    const fetchLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    };
+
+    fetchLocation();
+
+    const intervalId = setInterval(fetchLocation, 300000); // 300000ms = 5 minutes
+
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const getNavigationData = async () => {
+      let classBuildingName = courseData["locationInfo"]["buildingName"];
+
+      if (location != null) {
+        try {
+          const response = await getShortestPath(
+            location.coords,
+            classBuildingName
+          );
+
+          if (response) {
+            setNodes(response["nodes"]);
+            setEdges(response["edges"]);
+            setMinutesNeeded(response["minutesNeeded"]);
+            setDistance(response["distance"]);
+          }
+        } catch (error) {
+          console.error("Error fetching navigation data:", error);
+        }
+      }
+    };
+
+    getNavigationData();
+  }, [location]);
+
   return (
-    <View style={styles.courseContainer}>
-      <Text style={text_styles.scheduleCourseText}>{getCourseNumber()}</Text>
-      <Text style={text_styles.locationText}> {getLocation()}</Text>
-      <Text
-        style={[
-          text_styles.teacherText,
-          { fontSize: getTeacherName().fontSize },
-        ]}
-      >
-        {getTeacherName().name}
-      </Text>
-      <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
-    </View>
+    <TouchableWithoutFeedback onPress={toggleFlip}>
+      <View style={styles.courseContainer}>
+        {!isFlipped ? (
+          <>
+            <Text style={text_styles.scheduleCourseText}>
+              {getCourseNumber()}
+            </Text>
+            <Text style={text_styles.locationText}>{getLocation()}</Text>
+            <Text
+              style={[
+                text_styles.teacherText,
+                { fontSize: getTeacherName().fontSize },
+              ]}
+            >
+              {getTeacherName().name}
+            </Text>
+            <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
+          </>
+        ) : (
+          <MapWithPath
+            nodes={nodes}
+            edges={edges}
+            minutesNeeded={minutesNeeded}
+            distance={distance}
+          />
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -100,7 +184,7 @@ const styles = StyleSheet.create({
     marginVertical: screenHeight * 0.03,
     borderWidth: 2,
     borderRadius: 15,
-    padding: 20,
+
     backgroundColor: "#ADD8E6",
     width: screenWidth * 0.8,
     height: screenHeight * 0.2,
