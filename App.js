@@ -1,34 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Platform } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
-import SignIn from "./screens/SignIn";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { LogBox } from "react-native";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import api from "./api";
+import TestForNotifications from "./TestingInstallations/TestForNotifications";
+import { getUidFromAsyncStorage } from "./functions/getFromAsyncStorage";
+import SignIn from "./screens/SignIn";
 
-LogBox.ignoreAllLogs(); // Ignore all log notifications
-
+// Custom hook for polling AsyncStorage
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true; // Track mounted status
 
     const fetchValue = async () => {
-      const storedValue = await AsyncStorage.getItem(key);
-      if (isMounted) {
-        if (key === "schedule") {
+      try {
+        const storedValue = await AsyncStorage.getItem(key);
+        if (isMounted) {
+          // console.log(storedValue);
           setValue(storedValue ? JSON.parse(storedValue) : null);
-        } else {
-          setValue(storedValue);
         }
+      } catch (error) {
+        console.error("Failed to fetch from AsyncStorage:", error);
+        // Optionally, handle errors like showing a message to the user
       }
     };
 
@@ -37,7 +38,7 @@ function useAsyncStoragePolling(key, interval = 1000) {
     const id = setInterval(fetchValue, interval); // Start polling
 
     return () => {
-      isMounted = false;
+      isMounted = false; // Set as unmounted
       clearInterval(id); // Cleanup
     };
   }, [key, interval]);
@@ -81,62 +82,29 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-async function getUidFromAsyncStorage() {
-  return await AsyncStorage.getItem("uid");
-}
-
-async function saveScheduleToAsyncStorage(schedule) {
-  await AsyncStorage.setItem("schedule", JSON.stringify(schedule));
-}
-
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const uid = useAsyncStoragePolling("uid");
+  const schedule = useAsyncStoragePolling("Schedule");
+
   const [fontsLoaded] = useFonts({
     Gabarito: require("./assets/fonts/Gabarito-VariableFont_wght.ttf"),
   });
-
-  const uid = useAsyncStoragePolling("uid");
-  const localSchedule = useAsyncStoragePolling("Schedule");
-  const [schedule, setSchedule] = useState(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const uid = await getUidFromAsyncStorage();
-        if (uid) {
-          const response = await api.get("/displaySchedule", {
-            params: { uid },
-          });
-          const scheduleData = response.data["scheduleDictionaryArray"];
-          if (scheduleData != null) {
-            setSchedule(scheduleData);
-            await saveScheduleToAsyncStorage(scheduleData);
-          }
-
-          console.log("Got and saved schedule from backend");
-        }
-      } catch (error) {
-        console.log("Error fetching or saving schedule:", error);
-      }
-    };
-
-    fetchData();
-  }, [uid]);
-
   if (!fontsLoaded) {
     return <View />;
-  } else if (!uid) {
+  } else if (uid === null) {
     return (
       <View style={styles.container}>
         <SignIn />
       </View>
     );
-  } else if (!schedule && !localSchedule) {
+  } else if (schedule === null) {
     return (
       <View style={styles.container}>
         <ScheduleScreen />
