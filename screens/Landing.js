@@ -36,9 +36,20 @@ export default function LandingScreen() {
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
+  const [nextClassStartTime, setNextClassStartTime] = useState(null);
 
   const toggleNavigation = () => {
     setIsInNavigation(!isInNavigation);
+  };
+
+  const convertMinutesToFormattedTime = (minutesSinceMidnight) => {
+    const hours = Math.floor(minutesSinceMidnight / 60);
+    const minutes = minutesSinceMidnight % 60;
+    const hourIn12HourFormat = hours % 12 === 0 ? 12 : hours % 12; // Converts 0 hours to 12 for both midnight and noon
+    const amPm = hours < 12 ? "AM" : "PM";
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Adds leading zero to minutes if less than 10
+
+    return `${hourIn12HourFormat}:${formattedMinutes} ${amPm}`;
   };
 
   useEffect(() => {
@@ -53,13 +64,11 @@ export default function LandingScreen() {
         if (nextClass["courseNumber"] == null) {
           return;
         }
-        const title = "Head to " + nextClass["courseNumber"];
-        const body =
-          "Your " +
+        const title =
           nextClass["courseNumber"] +
-          " class starts in " +
-          minutesUntilNextClass +
-          " minutes. Start walking to make it on time";
+          " at " +
+          convertMinutesToFormattedTime(nextClassStartTime);
+        const body = "Start walking now";
 
         console.log("Sending notification...");
         await sendLocalNotification(title, body);
@@ -167,6 +176,8 @@ export default function LandingScreen() {
       const classStartMinutesPST = classStartTimeDateObject.getMinutes();
       const classStartTimeInMinutesPST =
         classStartHoursPST * 60 + classStartMinutesPST;
+
+      setNextClassStartTime(classStartTimeInMinutesPST);
       // console.log(classStartHoursPST);
       // Compare only the time part (in minutes) to find the next class
 
