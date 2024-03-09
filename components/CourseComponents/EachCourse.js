@@ -113,7 +113,7 @@ export default function EachCourse({ courseData }) {
 
     fetchLocation();
 
-    const intervalId = setInterval(fetchLocation, 300000); // 300000ms = 5 minutes
+    const intervalId = setInterval(fetchLocation, 1000);
 
     // Clear the interval on component unmount
     return () => clearInterval(intervalId);
@@ -145,36 +145,43 @@ export default function EachCourse({ courseData }) {
     getNavigationData();
   }, [location]);
 
-  return (
-    <TouchableWithoutFeedback onPress={toggleFlip}>
-      <View style={styles.courseContainer}>
-        {!isFlipped ? (
-          <>
-            <Text style={text_styles.scheduleCourseText}>
-              {getCourseNumber()}
-            </Text>
-            <Text style={text_styles.locationText}>{getLocation()}</Text>
-            <Text
-              style={[
-                text_styles.teacherText,
-                { fontSize: getTeacherName().fontSize },
-              ]}
-            >
-              {getTeacherName().name}
-            </Text>
-            <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
-          </>
-        ) : (
-          <MapWithPath
-            nodes={nodes}
-            edges={edges}
-            minutesNeeded={minutesNeeded}
-            distance={distance}
-          />
-        )}
-      </View>
-    </TouchableWithoutFeedback>
-  );
+  if (nodes != null) {
+    return (
+      <TouchableWithoutFeedback onPress={toggleFlip}>
+        <View style={styles.courseContainer}>
+          {!isFlipped ? (
+            <>
+              <Text style={text_styles.scheduleCourseText}>
+                {getCourseNumber()}
+              </Text>
+              <Text style={text_styles.locationText}>{getLocation()}</Text>
+              <Text
+                style={[
+                  text_styles.teacherText,
+                  { fontSize: getTeacherName().fontSize },
+                ]}
+              >
+                {getTeacherName().name}
+              </Text>
+              <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
+            </>
+          ) : (
+            <MapWithPath
+              nodes={nodes}
+              edges={edges}
+              minutesNeeded={minutesNeeded}
+              distance={distance}
+            />
+          )}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  } else {
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="#0000ff" />
+      <Text style={text_styles.titleText}>Loading your schedule</Text>
+    </View>;
+  }
 }
 
 const styles = StyleSheet.create({
