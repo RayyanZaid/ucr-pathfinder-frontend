@@ -6,6 +6,7 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import text_styles from "../../styles/text_styles";
 
@@ -100,88 +101,68 @@ export default function EachCourse({ courseData }) {
   }
 
   useEffect(() => {
-    const fetchLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.error("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    };
-
-    fetchLocation();
-
-    const intervalId = setInterval(fetchLocation, 1000);
-
-    // Clear the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    const getNavigationData = async () => {
-      let classBuildingName = courseData["locationInfo"]["buildingName"];
-
-      if (location != null) {
-        try {
-          const response = await getShortestPath(
-            location.coords,
-            classBuildingName
-          );
-
-          if (response) {
-            setNodes(response["nodes"]);
-            setEdges(response["edges"]);
-            setMinutesNeeded(response["minutesNeeded"]);
-            setDistance(response["distance"]);
-          }
-        } catch (error) {
-          console.error("Error fetching navigation data:", error);
+    const fetchData = async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.error("Permission to access location was denied");
+          return;
         }
+
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+
+        let classBuildingName = courseData["locationInfo"]["buildingName"];
+
+        const response = await getShortestPath(
+          location.coords,
+          classBuildingName
+        );
+
+        if (response) {
+          setNodes(response["nodes"]);
+          setEdges(response["edges"]);
+          setMinutesNeeded(response["minutesNeeded"]);
+          setDistance(response["distance"]);
+        }
+      } catch (error) {
+        console.error("Error fetching navigation data:", error);
       }
     };
 
-    getNavigationData();
-  }, [location]);
+    fetchData();
+  }, [courseData, isFlipped]);
 
-  if (nodes != null) {
-    return (
-      <TouchableWithoutFeedback onPress={toggleFlip}>
-        <View style={styles.courseContainer}>
-          {!isFlipped ? (
-            <>
-              <Text style={text_styles.scheduleCourseText}>
-                {getCourseNumber()}
-              </Text>
-              <Text style={text_styles.locationText}>{getLocation()}</Text>
-              <Text
-                style={[
-                  text_styles.teacherText,
-                  { fontSize: getTeacherName().fontSize },
-                ]}
-              >
-                {getTeacherName().name}
-              </Text>
-              <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
-            </>
-          ) : (
-            <MapWithPath
-              nodes={nodes}
-              edges={edges}
-              minutesNeeded={minutesNeeded}
-              distance={distance}
-            />
-          )}
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  } else {
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color="#0000ff" />
-      <Text style={text_styles.titleText}>Loading your schedule</Text>
-    </View>;
-  }
+  return (
+    <TouchableWithoutFeedback onPress={toggleFlip}>
+      <View style={styles.courseContainer}>
+        {!isFlipped ? (
+          <>
+            <Text style={text_styles.scheduleCourseText}>
+              {getCourseNumber()}
+            </Text>
+            <Text style={text_styles.locationText}>{getLocation()}</Text>
+            <Text
+              style={[
+                text_styles.teacherText,
+                { fontSize: getTeacherName().fontSize },
+              ]}
+            >
+              {getTeacherName().name}
+            </Text>
+            <Text style={text_styles.timeRangeText}>{getTimeRange()}</Text>
+          </>
+        ) : (
+          <MapWithPath
+            nodes={nodes}
+            edges={edges}
+            minutesNeeded={minutesNeeded}
+            distance={distance}
+          />
+        )}
+      </View>
+    </TouchableWithoutFeedback>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -193,6 +174,17 @@ const styles = StyleSheet.create({
     borderRadius: 15,
 
     backgroundColor: "#ADD8E6",
+    width: screenWidth * 0.8,
+    height: screenHeight * 0.2,
+  },
+
+  emptyCourseContainer: {
+    justifyContent: "center",
+    marginVertical: screenHeight * 0.03,
+    borderWidth: 2,
+    borderRadius: 15,
+
+    backgroundColor: "black",
     width: screenWidth * 0.8,
     height: screenHeight * 0.2,
   },
