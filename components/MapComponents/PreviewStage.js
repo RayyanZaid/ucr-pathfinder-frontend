@@ -5,6 +5,12 @@ import text_styles from "../../styles/text_styles";
 
 const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
   const mapRef = useRef(null);
+  var ucrRegion = {
+    latitude: 33.9737,
+    longitude: -117.3281,
+    latitudeDelta: 0.009,
+    longitudeDelta: 0.009,
+  };
 
   useEffect(() => {
     if (mapRef.current && nodes && nodes.length >= 2) {
@@ -40,7 +46,8 @@ const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
   return (
     <View style={styles.container}>
       <MapView
-        ref={mapRef}
+        // ref={mapRef}
+        initialRegion={ucrRegion}
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         showsUserLocation
