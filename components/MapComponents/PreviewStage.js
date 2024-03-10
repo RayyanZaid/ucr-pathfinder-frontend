@@ -28,8 +28,8 @@ const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
       const region = {
         latitude: (minLat + maxLat) / 2,
         longitude: (minLng + maxLng) / 2,
-        latitudeDelta: Math.abs(maxLat - minLat) * 1.2,
-        longitudeDelta: Math.abs(maxLng - minLng) * 1.2,
+        latitudeDelta: Math.abs(maxLat - minLat) * 2,
+        longitudeDelta: Math.abs(maxLng - minLng) * 2,
       };
 
       // Animate map to fit the markers

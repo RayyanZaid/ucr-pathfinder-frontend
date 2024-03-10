@@ -119,7 +119,7 @@ export default function LandingScreen() {
     fetchLocationAndGetNavigation();
 
     // Then set up the interval to repeat it.
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 1000); // Adjust the interval as needed.
+    const intervalId = setInterval(fetchLocationAndGetNavigation, 10000); // Adjust the interval as needed.
 
     // Cleanup on component unmount.
     return () => clearInterval(intervalId);
