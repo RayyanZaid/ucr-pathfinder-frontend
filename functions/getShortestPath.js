@@ -1,6 +1,6 @@
 import api from "../api";
 
-const getShortestPath = async (coords, classBuildingName) => {
+const getShortestPath = async (coords, classBuildingName, roomName) => {
   let nodes = null;
   let edges = null;
   let minutesNeeded = null;
@@ -13,6 +13,7 @@ const getShortestPath = async (coords, classBuildingName) => {
         longitude: coords.longitude,
         altitude: coords.altitude,
         classBuildingName,
+        roomName,
       },
     });
     if (response) {

@@ -113,10 +113,12 @@ export default function EachCourse({ courseData }) {
         setLocation(location);
 
         let classBuildingName = courseData["locationInfo"]["buildingName"];
-
+        let roomName = courseData["locationInfo"]["roomNumber"];
+        console.log(roomName);
         const response = await getShortestPath(
           location.coords,
-          classBuildingName
+          classBuildingName,
+          roomName
         );
 
         if (response) {
