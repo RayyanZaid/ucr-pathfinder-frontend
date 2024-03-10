@@ -89,7 +89,7 @@ const text_styles = StyleSheet.create({
 
   timeText: {
     ...fontStyles,
-    fontSize: screenHeight * 0.03,
+    fontSize: screenHeight * 0.02,
     position: "absolute", // Use absolute positioning
     top: screenHeight * 0.01, // Distance from the top of the parent View
     right: 10, // Distance from the right of the parent View
@@ -101,7 +101,7 @@ const text_styles = StyleSheet.create({
 
   distanceText: {
     ...fontStyles,
-    fontSize: screenHeight * 0.03,
+    fontSize: screenHeight * 0.02,
     position: "absolute", // Use absolute positioning
     top: screenHeight * 0.01, // Distance from the top of the parent View
     left: 10, // Distance from the right of the parent View

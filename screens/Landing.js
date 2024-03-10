@@ -21,7 +21,10 @@ import {
   getUidFromAsyncStorage,
 } from "../functions/getFromAsyncStorage";
 
+import { getShortestPath } from "../functions/getShortestPath";
+
 const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 export default function LandingScreen() {
   const [nextClass, setNextClass] = useState(null);
@@ -33,9 +36,20 @@ export default function LandingScreen() {
   const [minutesNeeded, setMinutesNeeded] = useState(null);
   const [distance, setDistance] = useState(null);
   const [notificationSent, setNotificationSent] = useState(false);
+  const [nextClassStartTime, setNextClassStartTime] = useState(null);
 
   const toggleNavigation = () => {
     setIsInNavigation(!isInNavigation);
+  };
+
+  const convertMinutesToFormattedTime = (minutesSinceMidnight) => {
+    const hours = Math.floor(minutesSinceMidnight / 60);
+    const minutes = minutesSinceMidnight % 60;
+    const hourIn12HourFormat = hours % 12 === 0 ? 12 : hours % 12; // Converts 0 hours to 12 for both midnight and noon
+    const amPm = hours < 12 ? "AM" : "PM";
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Adds leading zero to minutes if less than 10
+
+    return `${hourIn12HourFormat}:${formattedMinutes} ${amPm}`;
   };
 
   useEffect(() => {
@@ -50,13 +64,11 @@ export default function LandingScreen() {
         if (nextClass["courseNumber"] == null) {
           return;
         }
-        const title = "Head to " + nextClass["courseNumber"];
-        const body =
-          "Your " +
+        const title =
           nextClass["courseNumber"] +
-          " class starts in " +
-          minutesUntilNextClass +
-          " minutes. Start walking to make it on time";
+          " at " +
+          convertMinutesToFormattedTime(nextClassStartTime);
+        const body = "Start walking now";
 
         console.log("Sending notification...");
         await sendLocalNotification(title, body);
@@ -121,19 +133,13 @@ export default function LandingScreen() {
       let classBuildingName = nextClassData["locationInfo"]["buildingName"];
 
       try {
-        const response = await api.get("/getShortestPath", {
-          params: {
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-            altitude: coords.altitude,
-            classBuildingName,
-          },
-        });
+        const response = await getShortestPath(coords, classBuildingName);
+
         if (response) {
-          setNodes(response.data["nodes"]);
-          setEdges(response.data["edges"]);
-          setMinutesNeeded(Math.ceil(response.data["totalTime"]));
-          setDistance(Math.ceil(response.data["totalLength"]));
+          setNodes(response["nodes"]);
+          setEdges(response["edges"]);
+          setMinutesNeeded(response["minutesNeeded"]);
+          setDistance(response["distance"]);
         }
       } catch (error) {
         console.error("Error fetching navigation data:", error);
@@ -147,7 +153,7 @@ export default function LandingScreen() {
     let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
-    let currentDayNumber = now.getDay();
+    let currentDayNumber = now.getDay() - 1;
     let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
@@ -163,13 +169,16 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+      const currentTimeInMinutesPST =
+        currentHoursPST * 60 + currentMinutesPST - 2000;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
       const classStartMinutesPST = classStartTimeDateObject.getMinutes();
       const classStartTimeInMinutesPST =
         classStartHoursPST * 60 + classStartMinutesPST;
+
+      setNextClassStartTime(classStartTimeInMinutesPST);
       // console.log(classStartHoursPST);
       // Compare only the time part (in minutes) to find the next class
 
@@ -222,12 +231,16 @@ export default function LandingScreen() {
               Path to your {nextClass["courseNumber"]} class
             </Text>
             {/* {notificationSent ? <Text>Yay</Text> : <Text>No</Text>} */}
-            <MapWithPath
-              nodes={nodes}
-              edges={edges}
-              minutesNeeded={minutesNeeded}
-              distance={distance}
-            />
+
+            <View style={styles.mapContainer}>
+              <MapWithPath
+                nodes={nodes}
+                edges={edges}
+                minutesNeeded={minutesNeeded}
+                distance={distance}
+              />
+            </View>
+
             <Button
               onPress={toggleNavigation}
               title="Start Navigation"
@@ -258,5 +271,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: screenHeight * 0.05,
     paddingTop: screenHeight * 0.1,
+  },
+  mapContainer: {
+    height: screenHeight * 0.4,
+    width: screenWidth * 1,
   },
 });
