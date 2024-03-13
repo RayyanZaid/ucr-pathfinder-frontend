@@ -65,7 +65,7 @@ async function registerForPushNotificationsAsync() {
         projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
       })
     ).data;
-    console.log(token);
+    // console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");
   }
