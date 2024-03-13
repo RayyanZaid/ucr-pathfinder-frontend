@@ -46,7 +46,7 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
         closestNodeIndex = index;
       }
     });
-    console.log(closestNodeIndex);
+    // console.log(closestNodeIndex);
     return closestNodeIndex;
   };
 
@@ -104,16 +104,21 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
   }, [isInTesting, nodes, currentNodeIndex]);
 
   // Calculate ETA based on edges' time properties
+  // Calculate ETA based on edges' time properties
   useEffect(() => {
+    console.log("Calculating ETA");
     if (currentNodeIndex > nodes.length - 1) {
       setEta(0); // No more edges to traverse, so ETA should be 0
     } else {
-      const remainingEdges = edges.slice(currentNodeIndex - 1); // Start slice from currentNodeIndex - 1
+      const remainingEdges = edges.slice(currentNodeIndex + 1); // Start slice from currentNodeIndex
+
+      console.log(remainingEdges.length);
       if (remainingEdges.length > 0) {
         const remainingEta = remainingEdges.reduce(
           (acc, edge) => acc + edge.time,
           0
         );
+
         setEta(truncateToOneDecimalPlace(remainingEta));
       } else {
         setEta(0); // If no remaining edges, set ETA to 0
