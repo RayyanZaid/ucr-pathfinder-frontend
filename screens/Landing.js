@@ -174,7 +174,7 @@ export default function LandingScreen() {
       // Extract hours and minutes for current time in PST
       const currentHoursPST = now.getHours();
       const currentMinutesPST = now.getMinutes();
-      const currentTimeInMinutesPST = currentHoursPST * 60 + currentMinutesPST;
+      const currentTimeInMinutesPST = currentHoursPST * 1 + currentMinutesPST;
 
       // Extract hours and minutes for class start time in PST
       const classStartHoursPST = classStartTimeDateObject.getHours();
@@ -254,7 +254,7 @@ export default function LandingScreen() {
           </>
         ) : (
           <>
-            <NavigationStage />
+            <NavigationStage nodes={nodes} edges={edges} />
             <Button
               onPress={toggleNavigation}
               title="Cancel Navigation"
