@@ -254,7 +254,11 @@ export default function LandingScreen() {
           </>
         ) : (
           <>
-            <NavigationStage nodes={nodes} edges={edges} />
+            <NavigationStage
+              nodes={nodes}
+              edges={edges}
+              endNavigation={() => setIsInNavigation(false)} // Passing the endNavigation function
+            />
             <Button
               onPress={toggleNavigation}
               title="Cancel Navigation"

@@ -1,9 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import * as Location from "expo-location";
 import text_styles from "../../styles/text_styles";
 
-const NavigationStage = ({ nodes, edges }) => {
+const NavigationStage = ({ nodes, edges, endNavigation }) => {
+  const isInTesting = false; // Change to true for testing with simulated movement
+
   const mapRef = useRef(null);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [eta, setEta] = useState(0);
@@ -13,48 +16,108 @@ const NavigationStage = ({ nodes, edges }) => {
     return Math.floor(value * 10) / 10;
   }
 
-  // Simulate user movement along the nodes for demonstration
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log(currentNodeIndex);
-      if (currentNodeIndex < nodes.length) {
-        const node = nodes[currentNodeIndex];
-        setCurrentPosition({
-          latitude: parseFloat(node.location[0]),
-          longitude: parseFloat(node.location[1]),
-        });
-        if (mapRef.current) {
-          mapRef.current.animateToRegion(
-            {
-              ...currentPosition,
-              latitude: parseFloat(node.location[0]),
-              longitude: parseFloat(node.location[1]),
-              latitudeDelta: 0.001,
-              longitudeDelta: 0.001,
-            },
-            100
-          );
-        }
-        setCurrentNodeIndex(currentNodeIndex + 1);
-      } else {
-        clearInterval(interval);
-      }
-    }, 1000); // Move to the next node every 1 second for demonstration
+  // Function to calculate distance between two lat/lng coordinates in kilometers
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const p = 0.017453292519943295; // Math.PI / 180
+    const c = Math.cos;
+    const a =
+      0.5 -
+      c((lat2 - lat1) * p) / 2 +
+      (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
 
-    return () => clearInterval(interval);
-  }, [nodes]);
+    return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+  }
+
+  // Function to find the closest node to the user's current location
+  const findClosestNode = (userLocation, nodes) => {
+    let closestDistance = Infinity;
+    let closestNodeIndex = 0;
+
+    nodes.forEach((node, index) => {
+      const distance = calculateDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        parseFloat(node.location[0]),
+        parseFloat(node.location[1])
+      );
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestNodeIndex = index;
+      }
+    });
+    console.log(closestNodeIndex);
+    return closestNodeIndex;
+  };
+
+  useEffect(() => {
+    // when we are testing (simulate user movement)
+    if (isInTesting) {
+      // Simulate user movement along the nodes for demonstration (maybe we can demo this idk)
+      const interval = setInterval(() => {
+        if (currentNodeIndex < nodes.length) {
+          const node = nodes[currentNodeIndex];
+          setCurrentPosition({
+            latitude: parseFloat(node.location[0]),
+            longitude: parseFloat(node.location[1]),
+          });
+          if (mapRef.current) {
+            mapRef.current.animateToRegion(
+              {
+                latitude: parseFloat(node.location[0]),
+                longitude: parseFloat(node.location[1]),
+                latitudeDelta: 0.001,
+                longitudeDelta: 0.001,
+              },
+              100
+            );
+          }
+          setCurrentNodeIndex(currentNodeIndex + 1);
+        }
+      }, 1000); // Move to the next node every 1 second for demonstration
+
+      return () => clearInterval(interval);
+    }
+    // when we are NOT testing (get actual user movement)
+    else {
+      // Use actual user location and find closest node
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.error("Permission to access location was denied");
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        const userLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+
+        setCurrentPosition(userLocation);
+
+        // Find the closest node to the user's location
+        const closestNodeIndex = findClosestNode(userLocation, nodes);
+        setCurrentNodeIndex(closestNodeIndex); // Set the starting node based on user's location
+      })();
+    }
+  }, [isInTesting, nodes, currentNodeIndex]);
 
   // Calculate ETA based on edges' time properties
   useEffect(() => {
-    // Adjust condition to ensure ETA is set to 0 when all nodes have been visited
-    if (currentNodeIndex >= nodes.length - 1) {
+    if (currentNodeIndex > nodes.length - 1) {
       setEta(0); // No more edges to traverse, so ETA should be 0
-    } else if (edges.length > 0 && currentNodeIndex < edges.length) {
-      // Only calculate remaining ETA if there are edges left to traverse
-      const remainingEta = edges
-        .slice(currentNodeIndex) // Adjust slice to start from currentNodeIndex instead of currentNodeIndex - 1
-        .reduce((acc, edge) => acc + edge.time, 0);
-      setEta(truncateToOneDecimalPlace(remainingEta));
+    } else {
+      const remainingEdges = edges.slice(currentNodeIndex - 1); // Start slice from currentNodeIndex - 1
+      if (remainingEdges.length > 0) {
+        const remainingEta = remainingEdges.reduce(
+          (acc, edge) => acc + edge.time,
+          0
+        );
+        setEta(truncateToOneDecimalPlace(remainingEta));
+      } else {
+        setEta(0); // If no remaining edges, set ETA to 0
+      }
     }
   }, [edges, currentNodeIndex, nodes.length]);
 
@@ -94,6 +157,11 @@ const NavigationStage = ({ nodes, edges }) => {
           ETA: {truncateToOneDecimalPlace(eta)} mins
         </Text>
       </View>
+      {currentNodeIndex >= nodes.length - 1 && (
+        <View style={styles.endNavigationButtonContainer}>
+          <Button onPress={endNavigation} title="End Navigation" color="red" />
+        </View>
+      )}
     </View>
   );
 };
@@ -111,6 +179,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     backgroundColor: "rgba(255,255,255,0.8)",
+    padding: 10,
+  },
+  endNavigationButtonContainer: {
+    position: "absolute",
+    bottom: 100,
     padding: 10,
   },
 });
