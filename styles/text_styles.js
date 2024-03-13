@@ -39,7 +39,7 @@ const text_styles = StyleSheet.create({
   buttonText: {
     ...fontStyles,
     color: "black",
-    fontSize: screenHeight * 0.02,
+    fontSize: screenHeight * 0.04,
     fontWeight: "bold",
     textAlign: "center",
   },

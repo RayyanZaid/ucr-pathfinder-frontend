@@ -1,11 +1,21 @@
 import React, { useRef, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import text_styles from "../../styles/text_styles";
+import button_styles from "../../styles/button_styles";
+
+const screenHeight = Dimensions.get("window").height;
 
 const NavigationStage = ({ nodes, edges, endNavigation }) => {
-  const isInTesting = false; // Change to true for testing with simulated movement
+  const isInTesting = true; // Change to true for testing with simulated movement
 
   const mapRef = useRef(null);
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -110,9 +120,9 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
     if (currentNodeIndex > nodes.length - 1) {
       setEta(0); // No more edges to traverse, so ETA should be 0
     } else {
-      const remainingEdges = edges.slice(currentNodeIndex + 1); // Start slice from currentNodeIndex
+      const remainingEdges = edges.slice(currentNodeIndex - 1); // Start slice from currentNodeIndex
 
-      console.log(remainingEdges.length);
+      // console.log(remainingEdges.length);
       if (remainingEdges.length > 0) {
         const remainingEta = remainingEdges.reduce(
           (acc, edge) => acc + edge.time,
@@ -135,12 +145,15 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
         showsUserLocation={true}
         mapType="satellite"
         followUserLocation={true}
+        showsMyLocationButton={false} // Hide the default "My Location" button
         initialRegion={{
           latitude: nodes[0] ? parseFloat(nodes[0].location[0]) : 0,
           longitude: nodes[0] ? parseFloat(nodes[0].location[1]) : 0,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.001,
+          longitudeDelta: 0.001,
         }}
+        // Set the heading property to the user's heading
+        heading={currentPosition ? currentPosition.heading : 0}
       >
         {edges.map((edge, index) => (
           <Polyline
@@ -164,7 +177,12 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
       </View>
       {currentNodeIndex >= nodes.length - 1 && (
         <View style={styles.endNavigationButtonContainer}>
-          <Button onPress={endNavigation} title="End Navigation" color="red" />
+          <TouchableOpacity
+            onPress={endNavigation}
+            style={button_styles.navigationButton}
+          >
+            <Text style={text_styles.buttonText}>End Navigation</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -186,10 +204,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.8)",
     padding: 10,
   },
+
   endNavigationButtonContainer: {
     position: "absolute",
     bottom: 100,
-    padding: 10,
+    padding: 0,
+
+    borderRadius: 20,
+    marginBottom: screenHeight * 0.02,
   },
 });
 

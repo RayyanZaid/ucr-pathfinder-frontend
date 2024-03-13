@@ -5,6 +5,7 @@ import {
   Dimensions,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import text_styles from "../styles/text_styles";
@@ -158,7 +159,7 @@ export default function LandingScreen() {
     let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
-    let currentDayNumber = now.getDay();
+    let currentDayNumber = now.getDay() + 1;
     let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
@@ -229,13 +230,27 @@ export default function LandingScreen() {
   } else {
     return (
       <View style={styles.container}>
-        {!isInNavigation ? (
+        {isInNavigation ? (
+          <>
+            <View style={{ flex: 1, width: "100%" }}>
+              <NavigationStage
+                nodes={nodes}
+                edges={edges}
+                endNavigation={() => setIsInNavigation(false)}
+              />
+              <TouchableOpacity
+                onPress={toggleNavigation}
+                style={button_styles.navigationButton}
+              >
+                <Text style={text_styles.buttonText}>Cancel Navigation</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
           <>
             <Text style={text_styles.titleText}>
               Path to your {nextClass["courseNumber"]} class
             </Text>
-            {/* {notificationSent ? <Text>Yay</Text> : <Text>No</Text>} */}
-
             <View style={styles.mapContainer}>
               <MapWithPath
                 nodes={nodes}
@@ -244,26 +259,14 @@ export default function LandingScreen() {
                 distance={distance}
               />
             </View>
+            <TouchableOpacity
+              onPress={toggleNavigation}
+              style={button_styles.navigationButton}
+            >
+              <Text style={text_styles.buttonText}>Start Navigation</Text>
+            </TouchableOpacity>
 
-            <Button
-              onPress={toggleNavigation}
-              title="Start Navigation"
-              style={button_styles.mediumButton}
-            />
             <EachCourse courseData={nextClass} />
-          </>
-        ) : (
-          <>
-            <NavigationStage
-              nodes={nodes}
-              edges={edges}
-              endNavigation={() => setIsInNavigation(false)} // Passing the endNavigation function
-            />
-            <Button
-              onPress={toggleNavigation}
-              title="Cancel Navigation"
-              style={button_styles.mediumButton}
-            />
           </>
         )}
         <LogoutButton />
