@@ -13,14 +13,52 @@ import text_styles from "../../styles/text_styles";
 import button_styles from "../../styles/button_styles";
 
 const screenHeight = Dimensions.get("window").height;
-
 const NavigationStage = ({ nodes, edges, endNavigation }) => {
-  const isInTesting = true; // Change to true for testing with simulated movement
-
+  const isInTesting = false;
   const mapRef = useRef(null);
   const [currentPosition, setCurrentPosition] = useState(null);
-  const [eta, setEta] = useState(0);
+  const [heading, setHeading] = useState(0);
   const [currentNodeIndex, setCurrentNodeIndex] = useState(0);
+  const [eta, setEta] = useState(0);
+
+  // Updated function to include heading tracking
+  const watchPositionAndHeading = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Permission to access location was denied");
+      return;
+    }
+
+    await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.BestForNavigation,
+        timeInterval: 1000,
+        distanceInterval: 1,
+      },
+      (location) => {
+        const { latitude, longitude, heading } = location.coords;
+        const userLocation = { latitude, longitude };
+        setCurrentPosition(userLocation);
+        setHeading(heading);
+
+        // Optionally, animate map to the new position with heading
+        mapRef.current.animateCamera({
+          center: userLocation,
+          pitch: 0,
+          heading,
+          altitude: 1000,
+          zoom: 18,
+        });
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (!isInTesting) {
+      watchPositionAndHeading();
+    }
+    // Add cleanup code if needed, for example to stop watching the position
+  }, [isInTesting]); // Dependency array ensures effect runs only once
 
   function truncateToOneDecimalPlace(value) {
     return Math.floor(value * 10) / 10;
@@ -120,7 +158,7 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
     if (currentNodeIndex > nodes.length - 1) {
       setEta(0); // No more edges to traverse, so ETA should be 0
     } else {
-      const remainingEdges = edges.slice(currentNodeIndex - 1); // Start slice from currentNodeIndex
+      const remainingEdges = edges.slice(currentNodeIndex); // Start slice from currentNodeIndex
 
       // console.log(remainingEdges.length);
       if (remainingEdges.length > 0) {
@@ -129,6 +167,8 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
           0
         );
 
+        console.log(remainingEta);
+        console.log(remainingEdges.length);
         setEta(truncateToOneDecimalPlace(remainingEta));
       } else {
         setEta(0); // If no remaining edges, set ETA to 0
@@ -144,8 +184,8 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
         provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
         mapType="satellite"
-        followUserLocation={true}
-        showsMyLocationButton={false} // Hide the default "My Location" button
+        followUserLocation={true} // Follow the user's location
+        showsMyLocationButton={true} // Hide the default "My Location" button
         initialRegion={{
           latitude: nodes[0] ? parseFloat(nodes[0].location[0]) : 0,
           longitude: nodes[0] ? parseFloat(nodes[0].location[1]) : 0,
@@ -166,7 +206,7 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
             strokeWidth={6}
           />
         ))}
-        {currentPosition && (
+        {isInTesting && currentPosition && (
           <Marker coordinate={currentPosition} title="Current Position" />
         )}
       </MapView>

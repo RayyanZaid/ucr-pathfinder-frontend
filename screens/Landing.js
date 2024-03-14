@@ -159,7 +159,7 @@ export default function LandingScreen() {
     let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
-    let currentDayNumber = now.getDay() + 1;
+    let currentDayNumber = now.getDay();
     let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
