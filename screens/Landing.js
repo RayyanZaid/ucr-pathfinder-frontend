@@ -55,7 +55,7 @@ export default function LandingScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const bufferTime = 40;
+      const bufferTime = 65;
 
       if (
         nextClass &&
@@ -124,7 +124,46 @@ export default function LandingScreen() {
 
     // Cleanup on component unmount.
     return () => clearInterval(intervalId);
-  }, []); // Empty dependency array means this effect runs only on mount and unmount.
+  }, []);
+
+  useEffect(() => {
+    setNotificationSent(false);
+
+    console.log("nextClass changed to:", nextClass);
+  }, [JSON.stringify(nextClass)]);
+
+  useEffect(() => {
+    const fetchLocationAndGetNavigation = async () => {
+      console.log("Inital Fetch");
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      try {
+        const nextClassData = await getNextClass();
+
+        if (nextClassData) {
+          setNextClass(nextClassData);
+        } else {
+          return;
+        }
+
+        if (nextClassData && location.coords) {
+          await getNavigationData(nextClassData, location.coords);
+        }
+      } catch (error) {
+        console.error("Error in sequence operations:", error);
+      }
+    };
+
+    // Call the function immediately to run once on component mount.
+    fetchLocationAndGetNavigation();
+  }, []);
 
   const getNavigationData = async (nextClassData, coords) => {
     if (
