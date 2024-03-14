@@ -27,22 +27,21 @@ export default function EachCourse({ courseData }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const [pressStart, setPressStart] = useState(null);
-  
+
   const handlePressIn = () => {
     console.log("pin\n");
     setPressStart(Date.now());
-  }
+  };
 
   const handlePressOut = () => {
-    console.log((Date.now() - pressStart));
-    if((Date.now() - pressStart) > 200) {
+    console.log(Date.now() - pressStart);
+    if (Date.now() - pressStart > 100) {
       console.log("long press or pan\n");
-    }
-    else {
+    } else {
       console.log("short press\n");
       setIsFlipped(!isFlipped);
     }
-  }
+  };
 
   function getCourseNumber() {
     const courseNumber = courseData["courseNumber"];
@@ -150,7 +149,10 @@ export default function EachCourse({ courseData }) {
   }, [courseData, isFlipped]);
 
   return (
-    <TouchableWithoutFeedback onPressIn={handlePressIn} onPressOut={handlePressOut}>
+    <TouchableWithoutFeedback
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
       <View style={styles.courseContainer}>
         {!isFlipped ? (
           <>

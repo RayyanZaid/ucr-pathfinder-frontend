@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScheduleScreen from "./screens/Schedule";
@@ -14,8 +14,20 @@ import { getUidFromAsyncStorage } from "./functions/getFromAsyncStorage";
 import SignIn from "./screens/SignIn";
 
 import { LogBox } from "react-native";
+import LogoutButton from "./components/AuthComponents/LogoutButton";
 LogBox.ignoreAllLogs(); // Ignore all log notifications
 // Custom hook for polling AsyncStorage
+
+const globalScreenOptions = {
+  headerShown: true,
+  headerRight: () => <LogoutButton />,
+  headerStyle: {
+    backgroundColor: "white",
+  },
+
+  headerTitle: "",
+};
+
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
 
@@ -114,7 +126,7 @@ export default function App() {
   } else {
     return (
       <NavigationContainer>
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Navigator screenOptions={globalScreenOptions}>
           <Tab.Screen name="Landing" component={LandingScreen} />
           <Tab.Screen name="Schedule" component={ScheduleScreen} />
         </Tab.Navigator>
@@ -127,5 +139,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
 });

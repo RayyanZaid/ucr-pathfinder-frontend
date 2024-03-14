@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     position: "relative",
     borderRadius: 20,
     overflow: "hidden",
-    backgroundColor: "#000",
+    backgroundColor: "white",
   },
   map: {
     ...StyleSheet.absoluteFillObject,

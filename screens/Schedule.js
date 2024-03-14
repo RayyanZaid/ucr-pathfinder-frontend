@@ -110,11 +110,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "white",
   },
   trashIcon: {
     position: "absolute",
-    right: screenWidth * 0.1,
-    top: screenHeight * 0.06, // Adjusted for top right position
+    left: screenWidth * 0.05,
+    top: screenHeight * 0.01, // Adjusted for top right position
     zIndex: 10,
   },
 });

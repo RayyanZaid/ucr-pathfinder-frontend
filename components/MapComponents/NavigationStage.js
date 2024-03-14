@@ -13,7 +13,7 @@ import text_styles from "../../styles/text_styles";
 import button_styles from "../../styles/button_styles";
 
 const screenHeight = Dimensions.get("window").height;
-const NavigationStage = ({ nodes, edges, endNavigation }) => {
+const NavigationStage = ({ nodes, edges, endNavigation, isInNavigation }) => {
   const isInTesting = false;
   const mapRef = useRef(null);
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -41,14 +41,15 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
         setCurrentPosition(userLocation);
         setHeading(heading);
 
-        // Optionally, animate map to the new position with heading
-        mapRef.current.animateCamera({
-          center: userLocation,
-          pitch: 0,
-          heading,
-          altitude: 1000,
-          zoom: 18,
-        });
+        if (isInNavigation) {
+          mapRef.current.animateCamera({
+            center: userLocation,
+            pitch: 0,
+            heading,
+            altitude: 1000,
+            zoom: 18,
+          });
+        }
       }
     );
   };
@@ -61,7 +62,7 @@ const NavigationStage = ({ nodes, edges, endNavigation }) => {
   }, [isInTesting]); // Dependency array ensures effect runs only once
 
   function truncateToOneDecimalPlace(value) {
-    return Math.floor(value * 10) / 10;
+    return Math.round(value);
   }
 
   // Function to calculate distance between two lat/lng coordinates in kilometers
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
   overlay: {
     position: "absolute",
     bottom: 50,
-    backgroundColor: "rgba(255,255,255,0.8)",
+    backgroundColor: "white",
     padding: 10,
   },
 

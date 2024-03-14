@@ -224,7 +224,6 @@ export default function LandingScreen() {
     return (
       <View style={styles.container}>
         <Text style={text_styles.titleText}>{nextClass}</Text>
-        <LogoutButton />
       </View>
     );
   } else {
@@ -237,6 +236,7 @@ export default function LandingScreen() {
                 nodes={nodes}
                 edges={edges}
                 endNavigation={() => setIsInNavigation(false)}
+                isInNavigation={isInNavigation}
               />
               <TouchableOpacity
                 onPress={toggleNavigation}
@@ -269,7 +269,6 @@ export default function LandingScreen() {
             <EachCourse courseData={nextClass} />
           </>
         )}
-        <LogoutButton />
       </View>
     );
   }
@@ -280,11 +279,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: screenHeight * 0.05,
-    paddingTop: screenHeight * 0.1,
+
+    backgroundColor: "white",
   },
   mapContainer: {
-    height: screenHeight * 0.4,
+    height: screenHeight * 0.3,
     width: screenWidth * 1,
   },
 });
