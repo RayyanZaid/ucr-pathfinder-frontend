@@ -7,7 +7,7 @@ import text_styles from "../styles/text_styles";
 const SubmitButton = ({ buttonText, onPressFunction }) => {
   return (
     <TouchableOpacity
-      style={button_styles.submitButton}
+      style={button_styles.mediumButton}
       onPress={() => onPressFunction()}
     >
       <Text style={text_styles.buttonText}>{buttonText}</Text>
