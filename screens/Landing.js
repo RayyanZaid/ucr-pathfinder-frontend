@@ -55,7 +55,7 @@ export default function LandingScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const bufferTime = 65;
+      const bufferTime = 6;
 
       if (
         nextClass &&
@@ -198,7 +198,7 @@ export default function LandingScreen() {
     let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
-    let currentDayNumber = now.getDay() - 3;
+    let currentDayNumber = now.getDay();
     let scheduleCurrentDayIndex = currentDayNumber - 1;
     let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
 
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   mapContainer: {
-    height: screenHeight * 1,
+    height: screenHeight * 0.3,
     width: screenWidth * 1,
   },
 });
