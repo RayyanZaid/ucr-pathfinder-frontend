@@ -41,7 +41,7 @@ const NavigationStage = ({ nodes, edges, endNavigation, isInNavigation }) => {
         setCurrentPosition(userLocation);
         setHeading(heading);
 
-        if (isInNavigation) {
+        if (isInNavigation && mapRef.current) {
           mapRef.current.animateCamera({
             center: userLocation,
             pitch: 0,
@@ -185,7 +185,7 @@ const NavigationStage = ({ nodes, edges, endNavigation, isInNavigation }) => {
         provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
         mapType="satellite"
-        followUserLocation={true} // Follow the user's location
+        followUserLocation={!isInTesting} // Follow the user's location
         showsMyLocationButton={true} // Hide the default "My Location" button
         initialRegion={{
           latitude: nodes[0] ? parseFloat(nodes[0].location[0]) : 0,
