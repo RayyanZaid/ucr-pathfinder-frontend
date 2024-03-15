@@ -198,12 +198,19 @@ export default function LandingScreen() {
     let schedule = await getScheduleFromAsyncStorage();
 
     // Assuming the day index is correct
-    let currentDayNumber = now.getDay();
-    let scheduleCurrentDayIndex = currentDayNumber - 1;
-    let currentDayClasses = schedule[scheduleCurrentDayIndex] || [];
+    let currentDayNumber = -1;
 
-    if (currentDayClasses.length === 0) {
-      return "No classes today";
+    let currentDayClasses = null;
+
+    for (let i = 1; i < 5; i++) {
+      let scheduleCurrentDayIndex = i - 1;
+      let eachCurrentDayClasses = schedule[scheduleCurrentDayIndex] || [];
+
+      if (eachCurrentDayClasses.length !== 0) {
+        currentDayClasses = eachCurrentDayClasses;
+
+        break;
+      }
     }
 
     const nextClass = currentDayClasses.find((eachClass) => {
@@ -322,7 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   mapContainer: {
-    height: screenHeight * 0.3,
+    height: screenHeight * 1,
     width: screenWidth * 1,
   },
 });
