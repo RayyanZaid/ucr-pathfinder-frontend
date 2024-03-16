@@ -21,6 +21,7 @@ import {
 } from "../functions/getFromAsyncStorage";
 import api from "../api";
 import { saveScheduleToAsyncStorage } from "../functions/saveToAsyncStorage";
+import LogoutButton from "../components/AuthComponents/LogoutButton";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
@@ -74,6 +75,7 @@ export default function ScheduleScreen() {
 
   return (
     <View style={styles.container}>
+      <LogoutButton />
       {isSaved ? (
         <View>
           <TouchableOpacity
@@ -111,6 +113,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
+    marginTop: 40,
   },
   trashIcon: {
     position: "absolute",

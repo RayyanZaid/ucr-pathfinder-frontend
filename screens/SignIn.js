@@ -86,6 +86,8 @@ export default function SignIn() {
 
       // Wait for either the sendVerificationPromise or the timeoutPromise to resolve
       result = await Promise.race([sendVerificationPromise, timeoutPromise]);
+
+      console.log("sent verification");
     } catch (error) {
       console.error("Error sending verification code:", error);
       setStatusMessage("Failed to send verification code");
