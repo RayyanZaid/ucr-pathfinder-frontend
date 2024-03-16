@@ -30,7 +30,7 @@ import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import api from "../api";
 import { saveUidToAsyncStorage } from "../functions/saveToAsyncStorage";
 
-const skipAuth = false;
+const skipAuth = true;
 
 export default function SignIn() {
   // State Variables

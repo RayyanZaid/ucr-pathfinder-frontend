@@ -75,7 +75,6 @@ export default function ScheduleScreen() {
 
   return (
     <View style={styles.container}>
-      <LogoutButton />
       {isSaved ? (
         <View>
           <TouchableOpacity
@@ -87,7 +86,8 @@ export default function ScheduleScreen() {
           <FullScheduleDisplay />
         </View>
       ) : (
-        <View style={styles.container}>
+        <View style={styles.logoutContainer}>
+          <LogoutButton />
           <Text style={text_styles.infoText}>Before uploading, go to </Text>
           <Text
             style={text_styles.linkText}
@@ -113,8 +113,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
+  },
+
+  logoutContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
     marginTop: 40,
   },
+
   trashIcon: {
     position: "absolute",
     left: screenWidth * 0.05,
