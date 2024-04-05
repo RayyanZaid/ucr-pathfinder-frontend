@@ -116,14 +116,32 @@ export default function LandingScreen() {
       }
     };
 
-    // Call the function immediately to run once on component mount.
-    fetchLocationAndGetNavigation();
+    const startLocationMonitoring = async () => {
+      locationSubscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 300000,
+          distanceInterval: 20, // Call when user moves more than 50 meters
+        },
+        () => {
+          console.log("User has moved more than 20 meters");
+          fetchLocationAndGetNavigation();
+        }
+      );
+    };
 
-    // Then set up the interval to repeat it.
-    const intervalId = setInterval(fetchLocationAndGetNavigation, 5000); // Adjust the interval as needed.
+    startLocationMonitoring();
+
+    // Setup time-based calling
+    timeInterval = setInterval(fetchLocationAndGetNavigation, 300000);
 
     // Cleanup on component unmount.
-    return () => clearInterval(intervalId);
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+      clearInterval(timeInterval);
+    };
   }, []);
 
   useEffect(() => {
