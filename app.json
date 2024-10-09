@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ucr-pathfinder",
-    "slug": "ucr-pathfinder",
+    "slug": "ucr-pathfinder-october2024",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/navigation-icon.png",
@@ -28,7 +28,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "8918ddf4-b4d9-4e10-8248-5a86a8f4188b"
+        "projectId": "6fd3b6ff-a2bd-44fd-9ad0-0b291a5721b9"
       }
     },
     "runtimeVersion": {
@@ -39,6 +39,7 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "owner": "raytron2000"
   }
 }
