@@ -33,6 +33,7 @@ export default function ScheduleScreen() {
       try {
         // Fetch schedule from API
         const uid = await getUidFromAsyncStorage();
+        console.log("uid: ", uid);
         console.log("fetching schedule");
         const response = await api.get("/displaySchedule", { params: { uid } });
         const schedule = response.data["scheduleDictionaryArray"];

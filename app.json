@@ -4,16 +4,14 @@
     "slug": "ucr-pathfinder-october2024",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/navigation-icon.png",
+    "icon": "./assets/UCR-PathFinder-Logo.jpg",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -21,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.raytron2000.ucrpathfinderoctober2024"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,9 +36,7 @@
     "updates": {
       "url": "https://u.expo.dev/8918ddf4-b4d9-4e10-8248-5a86a8f4188b"
     },
-    "plugins": [
-      "expo-secure-store"
-    ],
+    "plugins": ["expo-secure-store"],
     "owner": "raytron2000"
   }
 }

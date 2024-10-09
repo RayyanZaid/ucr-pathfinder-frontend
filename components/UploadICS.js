@@ -50,38 +50,41 @@ export default function UploadICS({ onIsSavedChange }) {
   };
 
   const saveFile = async () => {
-    if (file) {
-      try {
-        const formData = new FormData();
-        formData.append("file", {
-          uri: file.assets[0].uri,
-          name: file.assets[0].name,
-          type: "*/*", // Adjust the file type as needed
-        });
+    getScheduleFromFirebase();
 
-        formData.append("uid", await getUidFromAsyncStorage());
+    // if (file) {
+    //   try {
+    //     const formData = new FormData();
+    //     formData.append("file", {
+    //       uri: file.assets[0].uri,
+    //       name: file.assets[0].name,
+    //       type: "*/*", // Adjust the file type as needed
+    //     });
 
-        const response = await api.post("/upload", formData);
+    //     formData.append("uid", await getUidFromAsyncStorage());
 
-        if (response.data.message === "File successfully uploaded") {
-          await getScheduleFromFirebase();
-        }
+    //     const response = await api.post("/upload", formData);
+    //     console.log(response.data);
 
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error uploading file: ", error);
-      }
-    }
+    //     if (response.data.message === "File successfully uploaded") {
+    //       await getScheduleFromFirebase();
+    //     }
+    //   } catch (error) {
+    //     console.error("Error uploading file: ", error);
+    //   }
+    // }
   };
 
   async function getScheduleFromFirebase() {
+    console.log("in getScheduleFromFirebase");
     console.log("Getting Schedule From Firebase");
     try {
       const uid = await getUidFromAsyncStorage();
+      console.log("uid: ", uid);
       api
         .get("/displaySchedule", { params: { uid } })
         .then(async (response) => {
-          // console.log(response.data["scheduleDictionaryArray"]);
+          console.log(response.data["scheduleDictionaryArray"]);
           console.log("Got schedule from backend");
 
           try {
