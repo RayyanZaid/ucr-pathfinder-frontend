@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `http://${process.env.EXPO_PUBLIC_LOCAL_IP_ADDRESS}`,
+  baseURL: `http://10.183.50.48:5000`,
   headers: {
     headers: {
       "Content-Type": "multipart/form-data",
