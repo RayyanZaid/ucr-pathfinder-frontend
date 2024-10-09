@@ -182,7 +182,6 @@ const NavigationStage = ({ nodes, edges, endNavigation, isInNavigation }) => {
       <MapView
         ref={mapRef}
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
         showsUserLocation={true}
         mapType="satellite"
         followUserLocation={!isInTesting} // Follow the user's location

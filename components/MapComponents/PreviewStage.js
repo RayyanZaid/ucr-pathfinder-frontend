@@ -49,7 +49,6 @@ const MapWithPath = ({ nodes, edges, minutesNeeded, distance }) => {
         // ref={mapRef}
         initialRegion={ucrRegion}
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
         showsUserLocation
         mapType="satellite"
       >
