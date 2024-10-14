@@ -50,29 +50,32 @@ export default function UploadICS({ onIsSavedChange }) {
   };
 
   const saveFile = async () => {
-    getScheduleFromFirebase();
+    // getScheduleFromFirebase();
 
-    // if (file) {
-    //   try {
-    //     const formData = new FormData();
-    //     formData.append("file", {
-    //       uri: file.assets[0].uri,
-    //       name: file.assets[0].name,
-    //       type: "*/*", // Adjust the file type as needed
-    //     });
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append("file", {
+          uri: file.assets[0].uri,
+          name: file.assets[0].name,
+          type: "*/*", // Adjust the file type as needed
+        });
 
-    //     formData.append("uid", await getUidFromAsyncStorage());
+        formData.append("uid", await getUidFromAsyncStorage());
 
-    //     const response = await api.post("/upload", formData);
-    //     console.log(response.data);
+        console.log("Will call the /upload route");
+        const response = await api.post("/upload", formData);
+        console.log("called the /upload route");
 
-    //     if (response.data.message === "File successfully uploaded") {
-    //       await getScheduleFromFirebase();
-    //     }
-    //   } catch (error) {
-    //     console.error("Error uploading file: ", error);
-    //   }
-    // }
+        console.log(response.data);
+
+        if (response.data.message === "File successfully uploaded") {
+          await getScheduleFromFirebase();
+        }
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
+    }
   };
 
   async function getScheduleFromFirebase() {
