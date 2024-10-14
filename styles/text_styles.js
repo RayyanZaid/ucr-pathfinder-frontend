@@ -20,7 +20,7 @@ const text_styles = StyleSheet.create({
     ...fontStyles,
     fontSize: screenHeight * 0.025,
 
-    margin: screenHeight * 0.005,
+    margin: screenHeight * 0.02,
     textAlign: "center",
   },
   input: {
@@ -32,7 +32,7 @@ const text_styles = StyleSheet.create({
     padding: 10,
     marginTop: screenHeight * 0.04,
     borderWidth: 3,
-    fontSize: screenHeight * 0.03,
+    fontSize: screenHeight * 0.025,
     fontWeight: "bold",
     color: "black",
   },

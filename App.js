@@ -1,33 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScheduleScreen from "./screens/Schedule";
 import LandingScreen from "./screens/Landing";
+import SettingsScreen from "./screens/Settings";
 import { useFonts } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import TestForNotifications from "./TestingInstallations/TestForNotifications";
-import { getUidFromAsyncStorage } from "./functions/getFromAsyncStorage";
 import SignIn from "./screens/SignIn";
-
 import { LogBox } from "react-native";
-import LogoutButton from "./components/AuthComponents/LogoutButton";
-LogBox.ignoreAllLogs(); // Ignore all log notifications
-// Custom hook for polling AsyncStorage
+import SettingsButton from "./components/SettingsButton";
+import { getUidFromAsyncStorage } from "./functions/getFromAsyncStorage";
+import UploadScheduleScreen from "./screens/UploadSchedule";
+
+// Ignore all log warnings
+LogBox.ignoreAllLogs();
 
 const globalScreenOptions = {
   headerShown: true,
-  headerRight: () => <LogoutButton />,
+  headerRight: () => <SettingsButton />, // Settings button appears in the header
   headerStyle: {
     backgroundColor: "white",
   },
-
   headerTitle: "",
 };
 
+const Tab = createBottomTabNavigator();
+
+// Custom hook to poll AsyncStorage for values
 function useAsyncStoragePolling(key, interval = 1000) {
   const [value, setValue] = useState(null);
 
@@ -46,18 +49,18 @@ function useAsyncStoragePolling(key, interval = 1000) {
     };
 
     fetchValue(); // Initial fetch
-
-    const id = setInterval(fetchValue, interval); // Start polling
+    const id = setInterval(fetchValue, interval); // Poll every interval
 
     return () => {
       isMounted = false;
-      clearInterval(id); // Cleanup
+      clearInterval(id); // Cleanup on unmount
     };
   }, [key, interval]);
 
   return value;
 }
 
+// Function to register for push notifications
 async function registerForPushNotificationsAsync() {
   let token;
   if (Constants.isDevice) {
@@ -69,7 +72,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
+      alert("Failed to get push token for push notifications!");
       return;
     }
     token = (
@@ -77,7 +80,6 @@ async function registerForPushNotificationsAsync() {
         projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
       })
     ).data;
-    // console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");
   }
@@ -94,8 +96,6 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-const Tab = createBottomTabNavigator();
-
 export default function App() {
   const uid = useAsyncStoragePolling("uid");
   const schedule = useAsyncStoragePolling("Schedule");
@@ -110,35 +110,37 @@ export default function App() {
 
   if (!fontsLoaded) {
     return <View />;
-  } else if (uid === null) {
+  }
+
+  if (uid === null) {
     return (
       <View style={styles.container}>
         <SignIn />
       </View>
     );
-  } else if (schedule === null) {
-    return (
-      <View style={styles.container}>
-        <ScheduleScreen />
-        <StatusBar style="auto" />
-      </View>
-    );
-  } else {
-    return (
-      <NavigationContainer>
-        <Tab.Navigator screenOptions={globalScreenOptions}>
-          <Tab.Screen name="Landing" component={LandingScreen} />
-          <Tab.Screen name="Schedule" component={ScheduleScreen} />
-        </Tab.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    );
   }
+
+  return (
+    <NavigationContainer>
+      <Tab.Navigator screenOptions={globalScreenOptions}>
+        <Tab.Screen name="Landing" component={LandingScreen} />
+        <Tab.Screen name="Schedule">
+          {() =>
+            schedule === null ? <UploadScheduleScreen /> : <ScheduleScreen />
+          }
+        </Tab.Screen>
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+      <StatusBar style="auto" />
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "white",
   },
 });

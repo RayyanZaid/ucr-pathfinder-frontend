@@ -4,7 +4,7 @@
     "slug": "ucr-pathfinder-october2024",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/UCR-PathFinder-Logo.jpg",
+    "icon": "./assets/logo.jpg",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",

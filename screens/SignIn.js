@@ -1,119 +1,72 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Button,
   StyleSheet,
   Text,
   View,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Dimensions,
 } from "react-native";
 
-// Imports for UI
-
 import text_styles from "../styles/text_styles";
-import PhoneNumberTextField from "../components/AuthComponents/PhoneNumberTextField";
-import VerificationCodeTextField from "../components/AuthComponents/VerificationCodeTextField";
-
 import SubmitButton from "../components/SubmitButton";
-
 import api from "../api";
 import { saveUidToAsyncStorage } from "../functions/saveToAsyncStorage";
 
+import { signInUser, signUpUser } from "../firebase";
 const skipAuth = true;
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
-export default function SignIn() {
-  // State Variables
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+export default function AuthScreen() {
+  const [isSignIn, setIsSignIn] = useState(true); // State to toggle between Sign In and Sign Up
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [statusMessage, setStatusMessage] = useState("");
-  const [
-    isClickedSendVerificationCodeButton,
-    setIsClickedSendVerificationCodeButton,
-  ] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
 
-  const handlePhoneNumberChange = (phone) => {
-    setPhoneNumber(phone);
+  const handleEmailInputChange = (text) => {
+    setEmail(text);
+    console.log("Email: " + email);
   };
 
-  const handleVerificationCodeChange = (code) => {
-    setVerificationCode(code);
+  const handlePasswordInputChange = (text) => {
+    setPassword(text);
+    console.log("Password: " + password);
   };
-  const onClickSendVerificationCode = async () => {
-    // using William's UID : TbpyIr6hrGWgK96zUCZYvVdMkjr1
-    if (skipAuth) {
-      saveUidToAsyncStorage("TbpyIr6hrGWgK96zUCZYvVdMkjr1");
-      return;
+  const onClickAuth = async () => {
+    // if (skipAuth) {
+    //   saveUidToAsyncStorage("TbpyIr6hrGWgK96zUCZYvVdMkjr1");
+    //   return;
+    // }
+
+    // console.log("Email: " + email);
+    // console.log("Password: " + password);
+
+    try {
+      if (isSignIn) {
+        console.log("Signing in with email and password.");
+        const userCredential = await signInUser(email, password);
+        const user = userCredential.user;
+        console.log("Signed in successfully:", user);
+        saveUidToAsyncStorage(user.uid); // Save user ID to AsyncStorage
+      } else {
+        console.log("Signing up with email and password.");
+        const userCredential = await signUpUser(email, password);
+        const user = userCredential.user;
+        console.log("User signed up successfully:", user);
+        // saveUidToAsyncStorage(user.uid); // Save user ID to AsyncStorage
+        setResultMessage("Verification email sent.");
+      }
+    } catch (error) {
+      console.error("Authentication error:", error.message);
+      setResultMessage(error.message);
     }
-    console.log(
-      "This function is responsible for sending the verification code."
-    );
-
-    // // First validate the phone number
-    // let isValidNumber = false;
-    // isValidNumber = validatePhoneNumber(phoneNumber);
-
-    // if (!isValidNumber) {
-    //   setStatusMessage("Please enter a valid phone number");
-    //   return;
-    // }
-
-    // // Sends a request to firebase for verification code.
-    // let result;
-    // try {
-    //   const sendVerificationPromise = sendVerificationCodeFirebase(
-    //     phoneNumber,
-    //     recaptchaVerifier.current
-    //   );
-
-    //   // Set a timeout to wait for 5 seconds
-    //   const timeoutPromise = new Promise((resolve) => {
-    //     setTimeout(() => {
-    //       resolve(null); // Resolving with null after 5 seconds
-    //     }, 5000);
-    //   });
-
-    //   // Wait for either the sendVerificationPromise or the timeoutPromise to resolve
-    //   result = await Promise.race([sendVerificationPromise, timeoutPromise]);
-
-    //   console.log("sent verification");
-    // } catch (error) {
-    //   console.error("Error sending verification code:", error);
-    //   setStatusMessage("Failed to send verification code");
-    //   return;
-    // }
-
-    // if (!result) {
-    //   // Timeout occurred
-    //   setStatusMessage("Firebase: Error (auth/too-many-requests).");
-    //   console.log(
-    //     "Timeout occurred, setting message to Firebase: Error (auth/too-many-requests)."
-    //   );
-
-    //   return;
-    // }
-
-    // // Proceed with handling the result if it's not null
-    // if (result.message === "Success") {
-    //   setVerificationId(result.verificationId);
-    //   setStatusMessage(null);
-    //   setIsClickedSendVerificationCodeButton(true);
-    // } else {
-    //   setStatusMessage(result.message);
-    //   console.log(result.message);
-    // }
-  };
-
-  const onClickSignIn = async () => {
-    if (skipAuth) {
-      saveUidToAsyncStorage("TbpyIr6hrGWgK96zUCZYvVdMkjr1");
-      return;
-    }
-    console.log(
-      "This function is responsible for sending the verification code."
-    );
   };
 
   return (
@@ -126,10 +79,48 @@ export default function SignIn() {
         contentContainerStyle={styles.inner}
         keyboardShouldPersistTaps="handled"
       >
-        <View>
+        <View style={styles.header}></View>
+
+        <Image
+          source={require("../assets/logo.jpg")}
+          style={{ width: screenWidth * 0.95, height: screenHeight * 0.4 }}
+          resizeMode="contain"
+        />
+        <View style={{ alignItems: "center", marginVertical: 10 }}>
+          <TextInput
+            style={text_styles.input}
+            onChangeText={handleEmailInputChange}
+            value={email}
+            placeholder={"Enter Email"}
+            autoCapitalize="none"
+            inputMode="email"
+            placeholderTextColor="black"
+          />
+
+          <TextInput
+            style={text_styles.input}
+            onChangeText={handlePasswordInputChange}
+            value={password}
+            placeholder={"Enter Password"}
+            autoCapitalize="none"
+            secureTextEntry={true}
+            placeholderTextColor="black"
+          />
+          <View style={{ alignItems: "center", marginVertical: 10 }}>
+            <TouchableOpacity onPress={() => setIsSignIn(!isSignIn)}>
+              <Text style={styles.switchText}>
+                {isSignIn
+                  ? "Don't have an account? Sign Up"
+                  : "Already have an account? Sign In"}
+              </Text>
+            </TouchableOpacity>
+
+            <Text style={text_styles.errorText}>{resultMessage}</Text>
+          </View>
+
           <SubmitButton
-            buttonText={"Proceed"}
-            onPressFunction={onClickSignIn}
+            buttonText={isSignIn ? "Sign In" : "Sign Up"}
+            onPressFunction={onClickAuth}
           />
         </View>
       </ScrollView>
@@ -145,5 +136,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  switchText: {
+    color: "blue",
+    marginTop: 10,
+    textDecorationLine: "underline",
   },
 });
