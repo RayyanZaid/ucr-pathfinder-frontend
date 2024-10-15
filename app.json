@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ucr-pathfinder",
-    "slug": "ucr-pathfinder-october2024",
+    "slug": "ucr-pathfinder-mxjk5ibmhx9lof4glhsx3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.jpg",
@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.raytron2000.ucrpathfinderoctober2024-v2"
@@ -28,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "6fd3b6ff-a2bd-44fd-9ad0-0b291a5721b9"
+        "projectId": "793615e7-d8e1-481c-a5cd-35aeab45e5a6"
       }
     },
     "runtimeVersion": {
@@ -37,7 +39,9 @@
     "updates": {
       "url": "https://u.expo.dev/8918ddf4-b4d9-4e10-8248-5a86a8f4188b"
     },
-    "plugins": ["expo-secure-store"],
+    "plugins": [
+      "expo-secure-store"
+    ],
     "owner": "raytron2000"
   }
 }
