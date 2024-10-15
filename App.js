@@ -120,15 +120,21 @@ export default function App() {
     );
   }
 
+  if (schedule === null) {
+    return (
+      <NavigationContainer>
+        <Tab.Navigator screenOptions={globalScreenOptions}>
+          <Tab.Screen name="Upload Schedule" component={UploadScheduleScreen} />
+        </Tab.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    );
+  }
   return (
     <NavigationContainer>
       <Tab.Navigator screenOptions={globalScreenOptions}>
         <Tab.Screen name="Landing" component={LandingScreen} />
-        <Tab.Screen name="Schedule">
-          {() =>
-            schedule === null ? <UploadScheduleScreen /> : <ScheduleScreen />
-          }
-        </Tab.Screen>
+        <Tab.Screen name="Schedule" component={ScheduleScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
       <StatusBar style="auto" />
