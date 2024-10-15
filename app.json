@@ -14,14 +14,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.raytron2000.ucrpathfinderoctober2024"
+      "bundleIdentifier": "com.raytron.ucrpathfinderoctober2024"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.raytron2000.ucrpathfinderoctober2024"
+      "package": "com.raytron.ucrpathfinderoctober2024"
     },
     "web": {
       "favicon": "./assets/favicon.png"
