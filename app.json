@@ -11,12 +11,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.raytron2000.ucrpathfinderoctober2024-v2"
+      "bundleIdentifier": "com.raytron2000.ucrpathfinderoctober2024"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,9 +35,7 @@
     "updates": {
       "url": "https://u.expo.dev/8918ddf4-b4d9-4e10-8248-5a86a8f4188b"
     },
-    "plugins": [
-      "expo-secure-store"
-    ],
+    "plugins": ["expo-secure-store"],
     "owner": "raytron"
   }
 }
