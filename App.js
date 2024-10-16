@@ -19,6 +19,10 @@ import UploadScheduleScreen from "./screens/UploadSchedule";
 // Ignore all log warnings
 LogBox.ignoreAllLogs();
 
+import { enableScreens } from "react-native-screens";
+
+enableScreens();
+
 const globalScreenOptions = {
   headerShown: true,
   headerRight: () => <SettingsButton />, // Settings button appears in the header
@@ -125,6 +129,7 @@ export default function App() {
       <NavigationContainer>
         <Tab.Navigator screenOptions={globalScreenOptions}>
           <Tab.Screen name="Upload Schedule" component={UploadScheduleScreen} />
+          <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

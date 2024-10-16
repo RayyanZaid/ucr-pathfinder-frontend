@@ -51,7 +51,7 @@ export default function UploadICS({ onIsSavedChange }) {
 
   const saveFile = async () => {
     // getScheduleFromFirebase();
-
+    console.log("Local IP: " + process.env.EXPO_PUBLIC_LOCAL_IP_ADDRESS);
     if (file) {
       try {
         const formData = new FormData();
@@ -84,6 +84,7 @@ export default function UploadICS({ onIsSavedChange }) {
     try {
       const uid = await getUidFromAsyncStorage();
       console.log("uid: ", uid);
+
       api
         .get("/displaySchedule", { params: { uid } })
         .then(async (response) => {

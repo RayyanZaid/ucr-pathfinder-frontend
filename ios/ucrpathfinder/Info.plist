@@ -27,7 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.raytron2000.ucrpathfinderoctober2024-v2</string>
+          <string>com.raytron.ucrpathfinderoctober2024</string>
         </array>
       </dict>
     </array>
@@ -38,10 +38,14 @@
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
-      <false/>
+      <true/>
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>We need access to upload your files.</string>
+    <key>NSNetworkUsageDescription</key>
+    <string>We need access to the internet for uploading your files.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

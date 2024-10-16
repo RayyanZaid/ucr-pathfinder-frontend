@@ -1,4 +1,4 @@
-package com.raytron2000.ucrpathfinderoctober2024
+package com.raytron.ucrpathfinderoctober2024
 
 import android.app.Application
 import android.content.res.Configuration

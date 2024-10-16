@@ -134,14 +134,6 @@ export default function LandingScreen() {
 
     // Setup time-based calling
     timeInterval = setInterval(fetchLocationAndGetNavigation, 300000);
-
-    // Cleanup on component unmount.
-    return () => {
-      if (locationSubscription) {
-        locationSubscription.remove();
-      }
-      clearInterval(timeInterval);
-    };
   }, []);
 
   useEffect(() => {
