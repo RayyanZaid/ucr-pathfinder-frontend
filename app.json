@@ -13,7 +13,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "googleServicesFile": "./GoogleService-Info.plist",
+      "googleServicesFile": "./ios/ucrpathfinder/GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.raytron.ucrpathfinderoctober2024"
     },

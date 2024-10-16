@@ -11,5 +11,15 @@
     "production": {
       "channel": "production"
     }
+  },
+
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "raymanzaid01@yahoo.com",
+        "ascAppId": "6736918341",
+        "appleTeamId": "Z5DZHFD9M8"
+      }
+    }
   }
 }
